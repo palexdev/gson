@@ -7,24 +7,23 @@ import java.util.*;
 /**
  * Utilities methods for manipulating dates in iso8601 format. This is much much faster and GC friendly than using SimpleDateFormat so
  * highly suitable if you (un)serialize lots of date objects.
- * 
+ * <p>
  * Supported parse format: [yyyy-MM-dd|yyyyMMdd][T(hh:mm[:ss[.sss]]|hhmm[ss[.sss]])]?[Z|[+-]hh[:]mm]]
- * 
+ *
  * @see <a href="http://www.w3.org/TR/NOTE-datetime">this specification</a>
  */
 //Date parsing code from Jackson databind ISO8601Utils.java
 // https://github.com/FasterXML/jackson-databind/blob/master/src/main/java/com/fasterxml/jackson/databind/util/ISO8601Utils.java
-public class ISO8601Utils
-{
+public class ISO8601Utils {
     /**
      * ID to represent the 'UTC' string, default timezone since Jackson 2.7
-     * 
+     *
      * @since 2.7
      */
     private static final String UTC_ID = "UTC";
     /**
      * The UTC timezone, prefetched to avoid more lookups.
-     * 
+     *
      * @since 2.7
      */
     private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone(UTC_ID);
@@ -37,7 +36,7 @@ public class ISO8601Utils
 
     /**
      * Format a date into 'yyyy-MM-ddThh:mm:ssZ' (default timezone, no milliseconds precision)
-     * 
+     *
      * @param date the date to format
      * @return the date formatted as 'yyyy-MM-ddThh:mm:ssZ'
      */
@@ -47,8 +46,8 @@ public class ISO8601Utils
 
     /**
      * Format a date into 'yyyy-MM-ddThh:mm:ss[.sss]Z' (GMT timezone)
-     * 
-     * @param date the date to format
+     *
+     * @param date   the date to format
      * @param millis true to include millis precision otherwise false
      * @return the date formatted as 'yyyy-MM-ddThh:mm:ss[.sss]Z'
      */
@@ -58,10 +57,10 @@ public class ISO8601Utils
 
     /**
      * Format date into yyyy-MM-ddThh:mm:ss[.sss][Z|[+-]hh:mm]
-     * 
-     * @param date the date to format
+     *
+     * @param date   the date to format
      * @param millis true to include millis precision otherwise false
-     * @param tz timezone to use for the formatting (UTC will produce 'Z')
+     * @param tz     timezone to use for the formatting (UTC will produce 'Z')
      * @return the date formatted as yyyy-MM-ddThh:mm:ss[.sss][Z|[+-]hh:mm]
      */
     public static String format(Date date, boolean millis, TimeZone tz) {
@@ -114,14 +113,14 @@ public class ISO8601Utils
     /**
      * Parse a date from ISO-8601 formatted string. It expects a format
      * [yyyy-MM-dd|yyyyMMdd][T(hh:mm[:ss[.sss]]|hhmm[ss[.sss]])]?[Z|[+-]hh[:mm]]]
-     * 
+     *
      * @param date ISO string to parse in the appropriate format.
-     * @param pos The position to start parsing from, updated to where parsing stopped.
+     * @param pos  The position to start parsing from, updated to where parsing stopped.
      * @return the parsed date
      * @throws ParseException if the date is not in the appropriate format
      */
     public static Date parse(String date, ParsePosition pos) throws ParseException {
-        Exception fail = null;
+        Exception fail;
         try {
             int offset = pos.getIndex();
 
@@ -147,7 +146,7 @@ public class ISO8601Utils
 
             // if the value has no time component (and no time zone), we are done
             boolean hasT = checkOffset(date, offset, 'T');
-            
+
             if (!hasT && (date.length() <= offset)) {
                 Calendar calendar = new GregorianCalendar(year, month - 1, day);
 
@@ -181,14 +180,14 @@ public class ISO8601Utils
                             int fraction = parseInt(date, offset, parseEndOffset);
                             // compensate for "missing" digits
                             switch (parseEndOffset - offset) { // number of digits parsed
-                            case 2:
-                                milliseconds = fraction * 10;
-                                break;
-                            case 1:
-                                milliseconds = fraction * 100;
-                                break;
-                            default:
-                                milliseconds = fraction;
+                                case 2:
+                                    milliseconds = fraction * 10;
+                                    break;
+                                case 1:
+                                    milliseconds = fraction * 100;
+                                    break;
+                                default:
+                                    milliseconds = fraction;
                             }
                             offset = endOffset;
                         }
@@ -201,7 +200,7 @@ public class ISO8601Utils
                 throw new IllegalArgumentException("No time zone indicator");
             }
 
-            TimeZone timezone = null;
+            TimeZone timezone;
             char timezoneIndicator = date.charAt(offset);
 
             if (timezoneIndicator == 'Z') {
@@ -236,13 +235,13 @@ public class ISO8601Utils
                          */
                         String cleaned = act.replace(":", "");
                         if (!cleaned.equals(timezoneId)) {
-                            throw new IndexOutOfBoundsException("Mismatching time zone indicator: "+timezoneId+" given, resolves to "
-                                    +timezone.getID());
+                            throw new IndexOutOfBoundsException("Mismatching time zone indicator: " + timezoneId + " given, resolves to "
+                                    + timezone.getID());
                         }
                     }
                 }
             } else {
-                throw new IndexOutOfBoundsException("Invalid time zone indicator '" + timezoneIndicator+"'");
+                throw new IndexOutOfBoundsException("Invalid time zone indicator '" + timezoneIndicator + "'");
             }
 
             Calendar calendar = new GregorianCalendar(timezone);
@@ -259,17 +258,13 @@ public class ISO8601Utils
             return calendar.getTime();
             // If we get a ParseException it'll already have the right message/offset.
             // Other exception types can convert here.
-        } catch (IndexOutOfBoundsException e) {
-            fail = e;
-        } catch (NumberFormatException e) {
-            fail = e;
-        } catch (IllegalArgumentException e) {
+        } catch (IndexOutOfBoundsException | IllegalArgumentException e) {
             fail = e;
         }
         String input = (date == null) ? null : ('"' + date + '"');
         String msg = fail.getMessage();
         if (msg == null || msg.isEmpty()) {
-            msg = "("+fail.getClass().getName()+")";
+            msg = "(" + fail.getClass().getName() + ")";
         }
         ParseException ex = new ParseException("Failed to parse date [" + input + "]: " + msg, pos.getIndex());
         ex.initCause(fail);
@@ -278,9 +273,9 @@ public class ISO8601Utils
 
     /**
      * Check if the expected character exist at the given offset in the value.
-     * 
-     * @param value the string to check at the specified offset
-     * @param offset the offset to look for the expected character
+     *
+     * @param value    the string to check at the specified offset
+     * @param offset   the offset to look for the expected character
      * @param expected the expected character
      * @return true if the expected character exist at the given offset
      */
@@ -290,10 +285,10 @@ public class ISO8601Utils
 
     /**
      * Parse an integer located between 2 given offsets in a string
-     * 
-     * @param value the string to parse
+     *
+     * @param value      the string to parse
      * @param beginIndex the start index for the integer in the string
-     * @param endIndex the end index for the integer in the string
+     * @param endIndex   the end index for the integer in the string
      * @return the int
      * @throws NumberFormatException if the value is not a number
      */
@@ -325,16 +320,14 @@ public class ISO8601Utils
 
     /**
      * Zero pad a number to a specified length
-     * 
+     *
      * @param buffer buffer to use for padding
-     * @param value the integer value to pad if necessary.
+     * @param value  the integer value to pad if necessary.
      * @param length the length of the string we should zero pad
      */
     private static void padInt(StringBuilder buffer, int value, int length) {
         String strValue = Integer.toString(value);
-        for (int i = length - strValue.length(); i > 0; i--) {
-            buffer.append('0');
-        }
+        buffer.append("0".repeat(Math.max(0, length - strValue.length())));
         buffer.append(strValue);
     }
 

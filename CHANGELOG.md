@@ -1,6 +1,13 @@
 Change Log
 ==========
 
+## Version 2.9.0
+
+* Fixed Long deserialization and serialization, no more precision issues! (thanks to @zenglian)
+* Use Gradle instead of Maven, updated Gradle to 7.1
+* Migrated to Java 11
+* Migrated to Junit 5
+
 ## Version 2.8.7
 
 * Fixed `ISO8601UtilsTest` failing on systems with UTC+X.

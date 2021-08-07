@@ -86,24 +86,22 @@ package com.google.gson;
  *
  * @author Inderjeet Singh
  * @author Joel Leitch
- *
  * @see GsonBuilder#setExclusionStrategies(ExclusionStrategy...)
  * @see GsonBuilder#addDeserializationExclusionStrategy(ExclusionStrategy)
  * @see GsonBuilder#addSerializationExclusionStrategy(ExclusionStrategy)
- *
  * @since 1.4
  */
 public interface ExclusionStrategy {
 
-  /**
-   * @param f the field object that is under test
-   * @return true if the field should be ignored; otherwise false
-   */
-  public boolean shouldSkipField(FieldAttributes f);
+    /**
+     * @param f the field object that is under test
+     * @return true if the field should be ignored; otherwise false
+     */
+    boolean shouldSkipField(FieldAttributes f);
 
-  /**
-   * @param clazz the class object that is under test
-   * @return true if the class should be ignored; otherwise false
-   */
-  public boolean shouldSkipClass(Class<?> clazz);
+    /**
+     * @param clazz the class object that is under test
+     * @return true if the class should be ignored; otherwise false
+     */
+    boolean shouldSkipClass(Class<?> clazz);
 }

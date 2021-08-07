@@ -23,21 +23,21 @@ package com.google.gson;
  * @author Joel Leitch
  */
 final class MockExclusionStrategy implements ExclusionStrategy {
-  private final boolean skipClass;
-  private final boolean skipField;
+    private final boolean skipClass;
+    private final boolean skipField;
 
-  public MockExclusionStrategy(boolean skipClass, boolean skipField) {
-    this.skipClass = skipClass;
-    this.skipField = skipField;
-  }
+    public MockExclusionStrategy(boolean skipClass, boolean skipField) {
+        this.skipClass = skipClass;
+        this.skipField = skipField;
+    }
 
-  @Override
-  public boolean shouldSkipField(FieldAttributes f) {
-    return skipField;
-  }
+    @Override
+    public boolean shouldSkipField(FieldAttributes f) {
+        return skipField;
+    }
 
-  @Override
-  public boolean shouldSkipClass(Class<?> clazz) {
-    return skipClass;
-  }
+    @Override
+    public boolean shouldSkipClass(Class<?> clazz) {
+        return skipClass;
+    }
 }

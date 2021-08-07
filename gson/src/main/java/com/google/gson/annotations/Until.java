@@ -16,11 +16,7 @@
 
 package com.google.gson.annotations;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * An annotation that indicates the version number until a member or a type should be present.
@@ -47,7 +43,7 @@ import java.lang.annotation.Target;
  * methods will use all the fields for serialization and deserialization. However, if you created
  * Gson with {@code Gson gson = new GsonBuilder().setVersion(1.2).create()} then the
  * {@code toJson()} and {@code fromJson()} methods of Gson will exclude the {@code emailAddress}
- * and {@code password} fields from the example above, because the version number passed to the 
+ * and {@code password} fields from the example above, because the version number passed to the
  * GsonBuilder, {@code 1.2}, exceeds the version number set on the {@code Until} annotation,
  * {@code 1.1}, for those fields.
  *
@@ -60,9 +56,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface Until {
 
-  /**
-   * the value indicating a version number until this member
-   * or type should be ignored.
-   */
-  double value();
+    /**
+     * the value indicating a version number until this member
+     * or type should be ignored.
+     */
+    double value();
 }

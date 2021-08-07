@@ -20,6 +20,7 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -58,7 +59,7 @@ import java.lang.annotation.Target;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * Since User class specified UserJsonAdapter.class in &#64;JsonAdapter annotation, it
  * will automatically be invoked to serialize/deserialize User instances. <br>
  *
@@ -72,7 +73,7 @@ import java.lang.annotation.Target;
  *   }
  * }
  * </pre>
- *
+ * <p>
  * It's possible to specify different type adapters on a field, that
  * field's type, and in the {@link com.google.gson.GsonBuilder}. Field
  * annotations take precedence over {@code GsonBuilder}-registered type
@@ -80,25 +81,28 @@ import java.lang.annotation.Target;
  *
  * <p>The class referenced by this annotation must be either a {@link
  * TypeAdapter} or a {@link TypeAdapterFactory}, or must implement one
- * or both of {@link JsonDeserializer} or {@link JsonSerializer}. 
- * Using {@link TypeAdapterFactory} makes it possible to delegate 
+ * or both of {@link JsonDeserializer} or {@link JsonSerializer}.
+ * Using {@link TypeAdapterFactory} makes it possible to delegate
  * to the enclosing {@code Gson} instance.
- *
- * @since 2.3
  *
  * @author Inderjeet Singh
  * @author Joel Leitch
  * @author Jesse Wilson
+ * @since 2.3
  */
 // Note that the above example is taken from AdaptAnnotationTest.
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.FIELD})
 public @interface JsonAdapter {
 
-  /** Either a {@link TypeAdapter} or {@link TypeAdapterFactory}, or one or both of {@link JsonDeserializer} or {@link JsonSerializer}. */
-  Class<?> value();
+    /**
+     * Either a {@link TypeAdapter} or {@link TypeAdapterFactory}, or one or both of {@link JsonDeserializer} or {@link JsonSerializer}.
+     */
+    Class<?> value();
 
-  /** false, to be able to handle {@code null} values within the adapter, default value is true. */
-  boolean nullSafe() default true;
+    /**
+     * false, to be able to handle {@code null} values within the adapter, default value is true.
+     */
+    boolean nullSafe() default true;
 
 }

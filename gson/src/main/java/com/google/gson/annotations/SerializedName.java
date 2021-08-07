@@ -16,11 +16,7 @@
 
 package com.google.gson.annotations;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * An annotation that indicates this member should be serialized to JSON with
@@ -72,22 +68,22 @@ import java.lang.annotation.Target;
  * </pre>
  * Note that MyClass.b is now deserialized from either name1, name2 or name3.
  *
- * @see com.google.gson.FieldNamingPolicy
- *
  * @author Inderjeet Singh
  * @author Joel Leitch
+ * @see com.google.gson.FieldNamingPolicy
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface SerializedName {
 
-  /**
-   * @return the desired name of the field when it is serialized or deserialized
-   */
-  String value();
-  /**
-   * @return the alternative names of the field when it is deserialized
-   */
-  String[] alternate() default {};
+    /**
+     * @return the desired name of the field when it is serialized or deserialized
+     */
+    String value();
+
+    /**
+     * @return the alternative names of the field when it is deserialized
+     */
+    String[] alternate() default {};
 }

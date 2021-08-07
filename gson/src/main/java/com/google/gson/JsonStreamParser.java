@@ -15,17 +15,17 @@
  */
 package com.google.gson;
 
+import com.google.gson.internal.Streams;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
+import com.google.gson.stream.MalformedJsonException;
+
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import com.google.gson.internal.Streams;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonToken;
-import com.google.gson.stream.MalformedJsonException;
 
 /**
  * A streaming parser that allows reading of multiple {@link JsonElement}s from the specified reader
@@ -35,7 +35,7 @@ import com.google.gson.stream.MalformedJsonException;
  * <p>This class is conditionally thread-safe (see Item 70, Effective Java second edition). To
  * properly use this class across multiple threads, you will need to add some external
  * synchronization. For example:
- * 
+ *
  * <pre>
  * JsonStreamParser parser = new JsonStreamParser("['first'] {'second':10} 'third'");
  * JsonElement element;
@@ -51,76 +51,76 @@ import com.google.gson.stream.MalformedJsonException;
  * @since 1.4
  */
 public final class JsonStreamParser implements Iterator<JsonElement> {
-  private final JsonReader parser;
-  private final Object lock;
+    private final JsonReader parser;
+    private final Object lock;
 
-  /**
-   * @param json The string containing JSON elements concatenated to each other.
-   * @since 1.4
-   */
-  public JsonStreamParser(String json) {
-    this(new StringReader(json));      
-  }
-  
-  /**
-   * @param reader The data stream containing JSON elements concatenated to each other.
-   * @since 1.4
-   */
-  public JsonStreamParser(Reader reader) {
-    parser = new JsonReader(reader);
-    parser.setLenient(true);
-    lock = new Object();
-  }
-  
-  /**
-   * Returns the next available {@link JsonElement} on the reader. Throws a
-   * {@link NoSuchElementException} if no element is available.
-   *
-   * @return the next available {@code JsonElement} on the reader.
-   * @throws JsonSyntaxException if the incoming stream is malformed JSON.
-   * @throws NoSuchElementException if no {@code JsonElement} is available.
-   * @since 1.4
-   */
-  public JsonElement next() throws JsonParseException {
-    if (!hasNext()) {
-      throw new NoSuchElementException();
+    /**
+     * @param json The string containing JSON elements concatenated to each other.
+     * @since 1.4
+     */
+    public JsonStreamParser(String json) {
+        this(new StringReader(json));
     }
-    
-    try {
-      return Streams.parse(parser);
-    } catch (StackOverflowError e) {
-      throw new JsonParseException("Failed parsing JSON source to Json", e);
-    } catch (OutOfMemoryError e) {
-      throw new JsonParseException("Failed parsing JSON source to Json", e);
-    } catch (JsonParseException e) {
-      throw e.getCause() instanceof EOFException ? new NoSuchElementException() : e;
-    }
-  }
 
-  /**
-   * Returns true if a {@link JsonElement} is available on the input for consumption
-   * @return true if a {@link JsonElement} is available on the input, false otherwise
-   * @throws JsonSyntaxException if the incoming stream is malformed JSON.
-   * @since 1.4
-   */
-  public boolean hasNext() {
-    synchronized (lock) {
-      try {
-        return parser.peek() != JsonToken.END_DOCUMENT;
-      } catch (MalformedJsonException e) {
-        throw new JsonSyntaxException(e);
-      } catch (IOException e) {
-        throw new JsonIOException(e);
-      }
+    /**
+     * @param reader The data stream containing JSON elements concatenated to each other.
+     * @since 1.4
+     */
+    public JsonStreamParser(Reader reader) {
+        parser = new JsonReader(reader);
+        parser.setLenient(true);
+        lock = new Object();
     }
-  }
 
-  /**
-   * This optional {@link Iterator} method is not relevant for stream parsing and hence is not
-   * implemented.
-   * @since 1.4
-   */
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
+    /**
+     * Returns the next available {@link JsonElement} on the reader. Throws a
+     * {@link NoSuchElementException} if no element is available.
+     *
+     * @return the next available {@code JsonElement} on the reader.
+     * @throws JsonSyntaxException    if the incoming stream is malformed JSON.
+     * @throws NoSuchElementException if no {@code JsonElement} is available.
+     * @since 1.4
+     */
+    public JsonElement next() throws JsonParseException {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+
+        try {
+            return Streams.parse(parser);
+        } catch (StackOverflowError | OutOfMemoryError e) {
+            throw new JsonParseException("Failed parsing JSON source to Json", e);
+        } catch (JsonParseException e) {
+            throw e.getCause() instanceof EOFException ? new NoSuchElementException() : e;
+        }
+    }
+
+    /**
+     * Returns true if a {@link JsonElement} is available on the input for consumption
+     *
+     * @return true if a {@link JsonElement} is available on the input, false otherwise
+     * @throws JsonSyntaxException if the incoming stream is malformed JSON.
+     * @since 1.4
+     */
+    public boolean hasNext() {
+        synchronized (lock) {
+            try {
+                return parser.peek() != JsonToken.END_DOCUMENT;
+            } catch (MalformedJsonException e) {
+                throw new JsonSyntaxException(e);
+            } catch (IOException e) {
+                throw new JsonIOException(e);
+            }
+        }
+    }
+
+    /**
+     * This optional {@link Iterator} method is not relevant for stream parsing and hence is not
+     * implemented.
+     *
+     * @since 1.4
+     */
+    public void remove() {
+        throw new UnsupportedOperationException();
+    }
 }
