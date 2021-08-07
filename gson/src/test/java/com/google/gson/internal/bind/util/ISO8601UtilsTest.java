@@ -1,19 +1,15 @@
 package com.google.gson.internal.bind.util;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ISO8601UtilsTest {
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     private static TimeZone utcTimeZone() {
         return TimeZone.getTimeZone("UTC");
@@ -86,9 +82,8 @@ public class ISO8601UtilsTest {
     }
 
     @Test
-    public void testDateParseInvalidTime() throws ParseException {
+    public void testDateParseInvalidTime() {
         String dateStr = "2018-06-25T61:60:62-03:00";
-        exception.expect(ParseException.class);
-        ISO8601Utils.parse(dateStr, new ParsePosition(0));
+        assertThrows(ParseException.class, () -> ISO8601Utils.parse(dateStr, new ParsePosition(0)));
     }
 }

@@ -20,16 +20,17 @@ import com.google.gson.common.MoreAsserts;
 import com.google.gson.internal.LinkedHashTreeMap.AvlBuilder;
 import com.google.gson.internal.LinkedHashTreeMap.AvlIterator;
 import com.google.gson.internal.LinkedHashTreeMap.Node;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public final class LinkedHashTreeMapTest extends TestCase {
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public final class LinkedHashTreeMapTest {
+
+  @Test
   public void testIterationOrder() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     map.put("a", "android");
     map.put("c", "cola");
     map.put("b", "bbq");
@@ -37,8 +38,9 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertIterationOrder(map.values(), "android", "cola", "bbq");
   }
 
+  @Test
   public void testRemoveRootDoesNotDoubleUnlink() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     map.put("a", "android");
     map.put("c", "cola");
     map.put("b", "bbq");
@@ -50,8 +52,9 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertIterationOrder(map.keySet(), "a", "c");
   }
 
+  @Test
   public void testPutNullKeyFails() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     try {
       map.put(null, "android");
       fail();
@@ -59,28 +62,32 @@ public final class LinkedHashTreeMapTest extends TestCase {
     }
   }
 
+  @Test
   public void testPutNonComparableKeyFails() {
-    LinkedHashTreeMap<Object, String> map = new LinkedHashTreeMap<Object, String>();
+    LinkedHashTreeMap<Object, String> map = new LinkedHashTreeMap<>();
     try {
       map.put(new Object(), "android");
       fail();
     } catch (ClassCastException expected) {}
   }
 
+  @Test
   public void testContainsNonComparableKeyReturnsFalse() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     map.put("a", "android");
     assertFalse(map.containsKey(new Object()));
   }
 
+  @Test
   public void testContainsNullKeyIsAlwaysFalse() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     map.put("a", "android");
     assertFalse(map.containsKey(null));
   }
 
-  public void testPutOverrides() throws Exception {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+  @Test
+  public void testPutOverrides() {
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     assertNull(map.put("d", "donut"));
     assertNull(map.put("e", "eclair"));
     assertNull(map.put("f", "froyo"));
@@ -91,8 +98,9 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertEquals(3, map.size());
   }
 
+  @Test
   public void testEmptyStringValues() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     map.put("a", "");
     assertTrue(map.containsKey("a"));
     assertEquals("", map.get("a"));
@@ -101,9 +109,10 @@ public final class LinkedHashTreeMapTest extends TestCase {
   // NOTE that this does not happen every time, but given the below predictable random,
   // this test will consistently fail (assuming the initial size is 16 and rehashing
   // size remains at 3/4)
-  public void testForceDoublingAndRehash() throws Exception {
+  @Test
+  public void testForceDoublingAndRehash() {
     Random random = new Random(1367593214724L);
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     String[] keys = new String[1000];
     for (int i = 0; i < keys.length; i++) {
       keys[i] = Integer.toString(Math.abs(random.nextInt()), 36) + "-" + i;
@@ -117,8 +126,9 @@ public final class LinkedHashTreeMapTest extends TestCase {
     }
   }
 
+  @Test
   public void testClear() {
-    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<String, String>();
+    LinkedHashTreeMap<String, String> map = new LinkedHashTreeMap<>();
     map.put("a", "android");
     map.put("c", "cola");
     map.put("b", "bbq");
@@ -127,14 +137,15 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertEquals(0, map.size());
   }
 
-  public void testEqualsAndHashCode() throws Exception {
-    LinkedHashTreeMap<String, Integer> map1 = new LinkedHashTreeMap<String, Integer>();
+  @Test
+  public void testEqualsAndHashCode() {
+    LinkedHashTreeMap<String, Integer> map1 = new LinkedHashTreeMap<>();
     map1.put("A", 1);
     map1.put("B", 2);
     map1.put("C", 3);
     map1.put("D", 4);
 
-    LinkedHashTreeMap<String, Integer> map2 = new LinkedHashTreeMap<String, Integer>();
+    LinkedHashTreeMap<String, Integer> map2 = new LinkedHashTreeMap<>();
     map2.put("C", 3);
     map2.put("B", 2);
     map2.put("D", 4);
@@ -143,6 +154,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
     MoreAsserts.assertEqualsAndHashCode(map1, map2);
   }
 
+  @Test
   public void testAvlWalker() {
     assertAvlWalker(node(node("a"), "b", node("c")),
         "a", "b", "c");
@@ -157,7 +169,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
   }
 
   private void assertAvlWalker(Node<String, String> root, String... values) {
-    AvlIterator<String, String> iterator = new AvlIterator<String, String>();
+    AvlIterator<String, String> iterator = new AvlIterator<>();
     iterator.reset(root);
     for (String value : values) {
       assertEquals(value, iterator.next().getKey());
@@ -165,6 +177,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertNull(iterator.next());
   }
 
+  @Test
   public void testAvlBuilder() {
     assertAvlBuilder(1, "a");
     assertAvlBuilder(2, "(. a b)");
@@ -190,7 +203,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
 
   private void assertAvlBuilder(int size, String expected) {
     char[] values = "abcdefghijklmnopqrstuvwxyzABCDE".toCharArray();
-    AvlBuilder<String, String> avlBuilder = new AvlBuilder<String, String>();
+    AvlBuilder<String, String> avlBuilder = new AvlBuilder<>();
     avlBuilder.reset(size);
     for (int i = 0; i < size; i++) {
       avlBuilder.add(node(Character.toString(values[i])));
@@ -198,6 +211,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertTree(expected, avlBuilder.root());
   }
 
+  @Test
   public void testDoubleCapacity() {
     @SuppressWarnings("unchecked") // Arrays and generics don't get along.
     Node<String, String>[] oldTable = new Node[1];
@@ -208,6 +222,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
     assertTree("(a c (. e g))", newTable[1]); // Odd hash codes!
   }
 
+  @Test
   public void testDoubleCapacityAllNodesOnLeft() {
     @SuppressWarnings("unchecked") // Arrays and generics don't get along.
     Node<String, String>[] oldTable = new Node[1];
@@ -224,10 +239,10 @@ public final class LinkedHashTreeMapTest extends TestCase {
     }
   }
 
-  private static final Node<String, String> head = new Node<String, String>();
+  private static final Node<String, String> head = new Node<>();
 
   private Node<String, String> node(String value) {
-    return new Node<String, String>(null, value, value.hashCode(), head, head);
+    return new Node<>(null, value, value.hashCode(), head, head);
   }
 
   private Node<String, String> node(Node<String, String> left, String value,
@@ -281,7 +296,7 @@ public final class LinkedHashTreeMapTest extends TestCase {
   }
 
   private <T> void assertIterationOrder(Iterable<T> actual, T... expected) {
-    ArrayList<T> actualList = new ArrayList<T>();
+    ArrayList<T> actualList = new ArrayList<>();
     for (T t : actual) {
       actualList.add(t);
     }

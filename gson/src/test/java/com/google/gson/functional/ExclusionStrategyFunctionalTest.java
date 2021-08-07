@@ -16,17 +16,16 @@
 
 package com.google.gson.functional;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import com.google.gson.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Performs some functional tests when Gson is instantiated with some common user defined
@@ -35,7 +34,7 @@ import junit.framework.TestCase;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class ExclusionStrategyFunctionalTest extends TestCase {
+public class ExclusionStrategyFunctionalTest {
   private static final ExclusionStrategy EXCLUDE_SAMPLE_OBJECT_FOR_TEST = new ExclusionStrategy() {
     @Override public boolean shouldSkipField(FieldAttributes f) {
       return false;
@@ -47,13 +46,13 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
 
   private SampleObjectForTest src;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     src = new SampleObjectForTest();
   }
 
-  public void testExclusionStrategySerialization() throws Exception {
+  @Test
+  public void testExclusionStrategySerialization() {
     Gson gson = createGson(new MyExclusionStrategy(String.class), true);
     String json = gson.toJson(src);
     assertFalse(json.contains("\"stringField\""));
@@ -61,6 +60,7 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertTrue(json.contains("\"longField\""));
   }
 
+  @Test
   public void testExclusionStrategySerializationDoesNotImpactDeserialization() {
     String json = "{\"annotatedField\":1,\"stringField\":\"x\",\"longField\":2}";
     Gson gson = createGson(new MyExclusionStrategy(String.class), true);
@@ -70,7 +70,8 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertEquals(2, value.longField);
   }
 
-  public void testExclusionStrategyDeserialization() throws Exception {
+  @Test
+  public void testExclusionStrategyDeserialization() {
     Gson gson = createGson(new MyExclusionStrategy(String.class), false);
     JsonObject json = new JsonObject();
     json.add("annotatedField", new JsonPrimitive(src.annotatedField + 5));
@@ -85,7 +86,8 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertEquals(src.stringField, target.stringField);
   }
 
-  public void testExclusionStrategySerializationDoesNotImpactSerialization() throws Exception {
+  @Test
+  public void testExclusionStrategySerializationDoesNotImpactSerialization() {
     Gson gson = createGson(new MyExclusionStrategy(String.class), false);
     String json = gson.toJson(src);
     assertTrue(json.contains("\"stringField\""));
@@ -93,7 +95,8 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertTrue(json.contains("\"longField\""));
   }
 
-  public void testExclusionStrategyWithMode() throws Exception {
+  @Test
+  public void testExclusionStrategyWithMode() {
     SampleObjectForTest testObj = new SampleObjectForTest(
         src.annotatedField + 5, src.stringField + "blah,blah",
         src.longField + 655L);
@@ -112,6 +115,7 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertEquals(src.stringField, target.stringField);
   }
 
+  @Test
   public void testExcludeTopLevelClassSerialization() {
     Gson gson = new GsonBuilder()
         .addSerializationExclusionStrategy(EXCLUDE_SAMPLE_OBJECT_FOR_TEST)
@@ -119,6 +123,7 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertEquals("null", gson.toJson(new SampleObjectForTest(), SampleObjectForTest.class));
   }
 
+  @Test
   public void testExcludeTopLevelClassSerializationDoesNotImpactDeserialization() {
     Gson gson = new GsonBuilder()
         .addSerializationExclusionStrategy(EXCLUDE_SAMPLE_OBJECT_FOR_TEST)
@@ -130,6 +135,7 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertEquals(2, value.longField);
   }
 
+  @Test
   public void testExcludeTopLevelClassDeserialization() {
     Gson gson = new GsonBuilder()
         .addDeserializationExclusionStrategy(EXCLUDE_SAMPLE_OBJECT_FOR_TEST)
@@ -139,6 +145,7 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
     assertNull(value);
   }
 
+  @Test
   public void testExcludeTopLevelClassDeserializationDoesNotImpactSerialization() {
     Gson gson = new GsonBuilder()
         .addDeserializationExclusionStrategy(EXCLUDE_SAMPLE_OBJECT_FOR_TEST)
@@ -163,7 +170,7 @@ public class ExclusionStrategyFunctionalTest extends TestCase {
 
   @Retention(RetentionPolicy.RUNTIME)
   @Target({ElementType.FIELD})
-  private static @interface Foo {
+  private @interface Foo {
     // Field tag only annotation
   }
 

@@ -16,50 +16,58 @@
 
 package com.google.gson;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import junit.framework.TestCase;
 
-public final class ObjectTypeAdapterTest extends TestCase {
-  private final Gson gson = new GsonBuilder().create();
-  private final TypeAdapter<Object> adapter = gson.getAdapter(Object.class);
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-  public void testDeserialize() throws Exception {
-    Map<?, ?> map = (Map<?, ?>) adapter.fromJson("{\"a\":5,\"b\":[1,2,null],\"c\":{\"x\":\"y\"}," +
-            "\"d\":9223372036854775807}");
-    assertEquals(5l, map.get("a"));
-    assertEquals(Arrays.asList(1l, 2l, null), map.get("b"));
-    assertEquals(Collections.singletonMap("x", "y"), map.get("c"));
-    assertEquals(Long.MAX_VALUE, map.get("d"));
-    assertEquals(4, map.size());
-  }
+public final class ObjectTypeAdapterTest {
+    private final Gson gson = new GsonBuilder().create();
+    private final TypeAdapter<Object> adapter = gson.getAdapter(Object.class);
 
-  public void testSerialize() throws Exception {
-    Object object = new RuntimeType();
-    assertEquals("{'a':5,'b':[1,2,null]}", adapter.toJson(object).replace("\"", "'"));
-  }
-  
-  public void testSerializeNullValue() throws Exception {
-    Map<String, Object> map = new LinkedHashMap<String, Object>();
-    map.put("a", null);
-    assertEquals("{'a':null}", adapter.toJson(map).replace('"', '\''));
-  }
+    @Test
+    public void testDeserialize() throws Exception {
+        Map<?, ?> map = (Map<?, ?>) adapter.fromJson("{\"a\":5,\"b\":[1,2,null],\"c\":{\"x\":\"y\"}," +
+                "\"d\":9223372036854775807}");
+        assertEquals(5L, map.get("a"));
+        assertEquals(Arrays.asList(1L, 2L, null), map.get("b"));
+        assertEquals(Collections.singletonMap("x", "y"), map.get("c"));
+        assertEquals(Long.MAX_VALUE, map.get("d"));
+        assertEquals(4, map.size());
+    }
 
-  public void testDeserializeNullValue() throws Exception {
-    Map<String, Object> map = new LinkedHashMap<String, Object>();
-    map.put("a", null);
-    assertEquals(map, adapter.fromJson("{\"a\":null}"));
-  }
+    @Test
+    public void testSerialize() {
+        Object object = new RuntimeType();
+        assertEquals("{'a':5,'b':[1,2,null]}", adapter.toJson(object).replace("\"", "'"));
+    }
 
-  public void testSerializeObject() throws Exception {
-    assertEquals("{}", adapter.toJson(new Object()));
-  }
+    @Test
+    public void testSerializeNullValue() {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", null);
+        assertEquals("{'a':null}", adapter.toJson(map).replace('"', '\''));
+    }
 
-  @SuppressWarnings("unused")
-  private class RuntimeType {
-    Object a = 5;
-    Object b = Arrays.asList(1, 2, null);
-  }
+    @Test
+    public void testDeserializeNullValue() throws Exception {
+        Map<String, Object> map = new LinkedHashMap<>();
+        map.put("a", null);
+        assertEquals(map, adapter.fromJson("{\"a\":null}"));
+    }
+
+    @Test
+    public void testSerializeObject() {
+        assertEquals("{}", adapter.toJson(new Object()));
+    }
+
+    @SuppressWarnings("unused")
+    private static class RuntimeType {
+        Object a = 5;
+        Object b = Arrays.asList(1, 2, null);
+    }
 }

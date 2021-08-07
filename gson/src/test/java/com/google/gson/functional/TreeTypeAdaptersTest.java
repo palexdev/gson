@@ -16,50 +16,46 @@
 
 package com.google.gson.functional;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.reflect.TypeToken;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Collection of functional tests for DOM tree based type adapters.
  */
-public class TreeTypeAdaptersTest extends TestCase {
-  private static final Id<Student> STUDENT1_ID = new Id<Student>("5", Student.class);
-  private static final Id<Student> STUDENT2_ID = new Id<Student>("6", Student.class);
+public class TreeTypeAdaptersTest {
+  private static final Id<Student> STUDENT1_ID = new Id<>("5", Student.class);
+  private static final Id<Student> STUDENT2_ID = new Id<>("6", Student.class);
   private static final Student STUDENT1 = new Student(STUDENT1_ID, "first");
   private static final Student STUDENT2 = new Student(STUDENT2_ID, "second");
   private static final Type TYPE_COURSE_HISTORY =
     new TypeToken<Course<HistoryCourse>>(){}.getType(); 
   private static final Id<Course<HistoryCourse>> COURSE_ID =
-      new Id<Course<HistoryCourse>>("10", TYPE_COURSE_HISTORY);
+          new Id<>("10", TYPE_COURSE_HISTORY);
 
   private Gson gson;
   private Course<HistoryCourse> course;
 
-  @Override
+  @BeforeEach
   protected void setUp() {
     gson = new GsonBuilder()
         .registerTypeAdapter(Id.class, new IdTreeTypeAdapter())
         .create();
-    course = new Course<HistoryCourse>(COURSE_ID, 4,
-        new Assignment<HistoryCourse>(null, null), createList(STUDENT1, STUDENT2));
+    course = new Course<>(COURSE_ID, 4,
+            new Assignment<>(null, null), createList(STUDENT1, STUDENT2));
   }
 
+  @Test
   public void testSerializeId() {
     String json = gson.toJson(course, TYPE_COURSE_HISTORY);
     assertTrue(json.contains(String.valueOf(COURSE_ID.getValue())));
@@ -67,6 +63,7 @@ public class TreeTypeAdaptersTest extends TestCase {
     assertTrue(json.contains(String.valueOf(STUDENT2_ID.getValue())));
   }
 
+  @Test
   public void testDeserializeId() {
     String json = "{courseId:1,students:[{id:1,name:'first'},{id:6,name:'second'}],"
       + "numAssignments:4,assignment:{}}";
@@ -135,7 +132,7 @@ public class TreeTypeAdaptersTest extends TestCase {
     private final Assignment<T> assignment;
 
     private Course() {
-      this(null, 0, null, new ArrayList<Student>());
+      this(null, 0, null, new ArrayList<>());
     }
 
     public Course(Id<Course<T>> courseId, int numAssignments,

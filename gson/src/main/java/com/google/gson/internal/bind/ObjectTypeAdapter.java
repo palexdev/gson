@@ -37,12 +37,7 @@ import java.util.Map;
  * serialization and a primitive/Map/List on deserialization.
  */
 public final class ObjectTypeAdapter extends TypeAdapter<Object> {
-  private final ThreadLocal<NumberFormat> numberFormat = new ThreadLocal<NumberFormat>() {
-    @Override
-    protected NumberFormat initialValue() {
-      return NumberFormat.getInstance();
-    }
-  };
+  private final ThreadLocal<NumberFormat> numberFormat = ThreadLocal.withInitial(NumberFormat::getInstance);
 
   public static final TypeAdapterFactory FACTORY = new TypeAdapterFactory() {
     @SuppressWarnings("unchecked")
@@ -64,7 +59,7 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
     JsonToken token = in.peek();
     switch (token) {
     case BEGIN_ARRAY:
-      List<Object> list = new ArrayList<Object>();
+      List<Object> list = new ArrayList<>();
       in.beginArray();
       while (in.hasNext()) {
         list.add(read(in));
@@ -91,7 +86,7 @@ public final class ObjectTypeAdapter extends TypeAdapter<Object> {
         throw new IllegalStateException(e);
       }
 
-      case BOOLEAN:
+    case BOOLEAN:
       return in.nextBoolean();
 
     case NULL:

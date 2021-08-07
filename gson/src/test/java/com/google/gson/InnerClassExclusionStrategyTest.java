@@ -17,42 +17,47 @@
 package com.google.gson;
 
 import com.google.gson.internal.Excluder;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Field;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit test for GsonBuilder.EXCLUDE_INNER_CLASSES.
  *
  * @author Joel Leitch
  */
-public class InnerClassExclusionStrategyTest extends TestCase {
+public class InnerClassExclusionStrategyTest {
   public InnerClass innerClass = new InnerClass();
   public StaticNestedClass staticNestedClass = new StaticNestedClass();
-  private Excluder excluder = Excluder.DEFAULT.disableInnerClassSerialization();
+  private final Excluder excluder = Excluder.DEFAULT.disableInnerClassSerialization();
 
-  public void testExcludeInnerClassObject() throws Exception {
+  @Test
+  public void testExcludeInnerClassObject() {
     Class<?> clazz = innerClass.getClass();
     assertTrue(excluder.excludeClass(clazz, true));
   }
 
+  @Test
   public void testExcludeInnerClassField() throws Exception {
     Field f = getClass().getField("innerClass");
     assertTrue(excluder.excludeField(f, true));
   }
 
-  public void testIncludeStaticNestedClassObject() throws Exception {
+  @Test
+  public void testIncludeStaticNestedClassObject() {
     Class<?> clazz = staticNestedClass.getClass();
     assertFalse(excluder.excludeClass(clazz, true));
   }
 
+  @Test
   public void testIncludeStaticNestedClassField() throws Exception {
     Field f = getClass().getField("staticNestedClass");
     assertFalse(excluder.excludeField(f, true));
   }
 
-  class InnerClass {
-  }
-
-  static class StaticNestedClass {
-  }
+  static class InnerClass { }
+  static class StaticNestedClass { }
 }

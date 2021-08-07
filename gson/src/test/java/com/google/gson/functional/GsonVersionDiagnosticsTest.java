@@ -15,37 +15,36 @@
  */
 package com.google.gson.functional;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Functional tests to validate printing of Gson version on AssertionErrors
  *
  * @author Inderjeet Singh
  */
-public class GsonVersionDiagnosticsTest extends TestCase {
+public class GsonVersionDiagnosticsTest {
   private static final Pattern GSON_VERSION_PATTERN = Pattern.compile("(\\(GSON \\d\\.\\d\\.\\d)(?:[-.][A-Z]+)?\\)$");
 
   private Gson gson;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     gson = new GsonBuilder().registerTypeAdapter(TestType.class, new TypeAdapter<TestType>() {
       @Override public void write(JsonWriter out, TestType value) {
         throw new AssertionError("Expected during serialization");
       }
-      @Override public TestType read(JsonReader in) throws IOException {
+      @Override public TestType read(JsonReader in) {
         throw new AssertionError("Expected during deserialization");
       }
     }).create();

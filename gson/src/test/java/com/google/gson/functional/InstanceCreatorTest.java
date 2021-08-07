@@ -22,15 +22,16 @@ import com.google.gson.InstanceCreator;
 import com.google.gson.common.TestTypes.Base;
 import com.google.gson.common.TestTypes.ClassWithBaseField;
 import com.google.gson.common.TestTypes.Sub;
-
 import com.google.gson.reflect.TypeToken;
-import java.util.ArrayList;
-import java.util.List;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional Test exercising custom serialization only. When test applies to both
@@ -38,28 +39,22 @@ import java.util.TreeSet;
  *
  * @author Inderjeet Singh
  */
-public class InstanceCreatorTest extends TestCase {
+public class InstanceCreatorTest {
 
+  @Test
   public void testInstanceCreatorReturnsBaseType() {
     Gson gson = new GsonBuilder()
-      .registerTypeAdapter(Base.class, new InstanceCreator<Base>() {
-        @Override public Base createInstance(Type type) {
-         return new Base();
-       }
-      })
+      .registerTypeAdapter(Base.class, (InstanceCreator<Base>) type -> new Base())
       .create();
     String json = "{baseName:'BaseRevised',subName:'Sub'}";
     Base base = gson.fromJson(json, Base.class);
     assertEquals("BaseRevised", base.baseName);
   }
 
+  @Test
   public void testInstanceCreatorReturnsSubTypeForTopLevelObject() {
     Gson gson = new GsonBuilder()
-    .registerTypeAdapter(Base.class, new InstanceCreator<Base>() {
-      @Override public Base createInstance(Type type) {
-        return new Sub();
-      }
-    })
+    .registerTypeAdapter(Base.class, (InstanceCreator<Base>) type -> new Sub())
     .create();
 
     String json = "{baseName:'Base',subName:'SubRevised'}";
@@ -67,17 +62,14 @@ public class InstanceCreatorTest extends TestCase {
     assertTrue(base instanceof Sub);
 
     Sub sub = (Sub) base;
-    assertFalse("SubRevised".equals(sub.subName));
+    assertNotEquals("SubRevised", sub.subName);
     assertEquals(Sub.SUB_NAME, sub.subName);
   }
 
+  @Test
   public void testInstanceCreatorReturnsSubTypeForField() {
     Gson gson = new GsonBuilder()
-    .registerTypeAdapter(Base.class, new InstanceCreator<Base>() {
-      @Override public Base createInstance(Type type) {
-        return new Sub();
-      }
-    })
+    .registerTypeAdapter(Base.class, (InstanceCreator<Base>) type -> new Sub())
     .create();
     String json = "{base:{baseName:'Base',subName:'SubRevised'}}";
     ClassWithBaseField target = gson.fromJson(json, ClassWithBaseField.class);
@@ -86,14 +78,10 @@ public class InstanceCreatorTest extends TestCase {
   }
 
   // This regressed in Gson 2.0 and 2.1
+  @Test
   public void testInstanceCreatorForCollectionType() {
-    @SuppressWarnings("serial")
     class SubArrayList<T> extends ArrayList<T> {}
-    InstanceCreator<List<String>> listCreator = new InstanceCreator<List<String>>() {
-      @Override public List<String> createInstance(Type type) {
-        return new SubArrayList<String>();
-      }
-    };
+    InstanceCreator<List<String>> listCreator = type -> new SubArrayList<>();
     Type listOfStringType = new TypeToken<List<String>>() {}.getType();
     Gson gson = new GsonBuilder()
         .registerTypeAdapter(listOfStringType, listCreator)
@@ -103,14 +91,10 @@ public class InstanceCreatorTest extends TestCase {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void testInstanceCreatorForParametrizedType() throws Exception {
-    @SuppressWarnings("serial")
+  @Test
+  public void testInstanceCreatorForParametrizedType() {
     class SubTreeSet<T> extends TreeSet<T> {}
-    InstanceCreator<SortedSet> sortedSetCreator = new InstanceCreator<SortedSet>() {
-      @Override public SortedSet createInstance(Type type) {
-        return new SubTreeSet();
-      }
-    };
+    InstanceCreator<SortedSet> sortedSetCreator = type -> new SubTreeSet();
     Gson gson = new GsonBuilder()
         .registerTypeAdapter(SortedSet.class, sortedSetCreator)
         .create();

@@ -19,12 +19,16 @@ package com.google.gson.internal.bind;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonToken;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("resource")
-public final class JsonElementReaderTest extends TestCase {
+public final class JsonElementReaderTest {
 
+  @Test
   public void testNumbers() throws IOException {
     JsonElement element = JsonParser.parseString("[1, 2, 3]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -35,6 +39,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testLenientNansAndInfinities() throws IOException {
     JsonElement element = JsonParser.parseString("[NaN, -Infinity, Infinity]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -46,6 +51,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testStrictNansAndInfinities() throws IOException {
     JsonElement element = JsonParser.parseString("[NaN, -Infinity, Infinity]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -54,24 +60,25 @@ public final class JsonElementReaderTest extends TestCase {
     try {
       reader.nextDouble();
       fail();
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException ignored) {
     }
     assertEquals("NaN", reader.nextString());
     try {
       reader.nextDouble();
       fail();
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException ignored) {
     }
     assertEquals("-Infinity", reader.nextString());
     try {
       reader.nextDouble();
       fail();
-    } catch (NumberFormatException e) {
+    } catch (NumberFormatException ignored) {
     }
     assertEquals("Infinity", reader.nextString());
     reader.endArray();
   }
 
+  @Test
   public void testNumbersFromStrings() throws IOException {
     JsonElement element = JsonParser.parseString("[\"1\", \"2\", \"3\"]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -82,6 +89,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testStringsFromNumbers() throws IOException {
     JsonElement element = JsonParser.parseString("[1]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -90,15 +98,17 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testBooleans() throws IOException {
     JsonElement element = JsonParser.parseString("[true, false]");
     JsonTreeReader reader = new JsonTreeReader(element);
     reader.beginArray();
-    assertEquals(true, reader.nextBoolean());
-    assertEquals(false, reader.nextBoolean());
+    assertTrue(reader.nextBoolean());
+    assertFalse(reader.nextBoolean());
     reader.endArray();
   }
 
+  @Test
   public void testNulls() throws IOException {
     JsonElement element = JsonParser.parseString("[null,null]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -108,6 +118,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testStrings() throws IOException {
     JsonElement element = JsonParser.parseString("[\"A\",\"B\"]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -117,6 +128,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testArray() throws IOException {
     JsonElement element = JsonParser.parseString("[1, 2, 3]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -133,6 +145,7 @@ public final class JsonElementReaderTest extends TestCase {
     assertEquals(JsonToken.END_DOCUMENT, reader.peek());
   }
 
+  @Test
   public void testObject() throws IOException {
     JsonElement element = JsonParser.parseString("{\"A\": 1, \"B\": 2}");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -151,6 +164,7 @@ public final class JsonElementReaderTest extends TestCase {
     assertEquals(JsonToken.END_DOCUMENT, reader.peek());
   }
 
+  @Test
   public void testEmptyArray() throws IOException {
     JsonElement element = JsonParser.parseString("[]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -158,6 +172,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testNestedArrays() throws IOException {
     JsonElement element = JsonParser.parseString("[[],[[]]]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -171,6 +186,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testNestedObjects() throws IOException {
     JsonElement element = JsonParser.parseString("{\"A\":{},\"B\":{\"C\":{}}}");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -187,6 +203,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endObject();
   }
 
+  @Test
   public void testEmptyObject() throws IOException {
     JsonElement element = JsonParser.parseString("{}");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -194,6 +211,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endObject();
   }
 
+  @Test
   public void testSkipValue() throws IOException {
     JsonElement element = JsonParser.parseString("[\"A\",{\"B\":[[]]},\"C\",[[]],\"D\",null]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -207,6 +225,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testWrongType() throws IOException {
     JsonElement element = JsonParser.parseString("[[],\"A\"]");
     JsonTreeReader reader = new JsonTreeReader(element);
@@ -298,6 +317,7 @@ public final class JsonElementReaderTest extends TestCase {
     reader.endArray();
   }
 
+  @Test
   public void testEarlyClose() throws IOException {
     JsonElement element = JsonParser.parseString("[1, 2, 3]");
     JsonTreeReader reader = new JsonTreeReader(element);

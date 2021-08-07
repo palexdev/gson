@@ -16,19 +16,22 @@
 
 package com.google.gson;
 
-import junit.framework.TestCase;
-
 import com.google.gson.common.MoreAsserts;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Jesse Wilson
  */
-public final class JsonArrayTest extends TestCase {
+public final class JsonArrayTest {
 
+  @Test
   public void testEqualsOnEmptyArray() {
     MoreAsserts.assertEqualsAndHashCode(new JsonArray(), new JsonArray());
   }
 
+  @Test
   public void testEqualsNonEmptyArray() {
     JsonArray a = new JsonArray();
     JsonArray b = new JsonArray();
@@ -36,21 +39,22 @@ public final class JsonArrayTest extends TestCase {
     assertEquals(a, a);
 
     a.add(new JsonObject());
-    assertFalse(a.equals(b));
-    assertFalse(b.equals(a));
+    assertNotEquals(a, b);
+    assertNotEquals(b, a);
 
     b.add(new JsonObject());
     MoreAsserts.assertEqualsAndHashCode(a, b);
 
     a.add(new JsonObject());
-    assertFalse(a.equals(b));
-    assertFalse(b.equals(a));
+    assertNotEquals(a, b);
+    assertNotEquals(b, a);
 
     b.add(JsonNull.INSTANCE);
-    assertFalse(a.equals(b));
-    assertFalse(b.equals(a));
+    assertNotEquals(a, b);
+    assertNotEquals(b, a);
   }
 
+  @Test
   public void testRemove() {
     JsonArray array = new JsonArray();
     try {
@@ -68,6 +72,7 @@ public final class JsonArrayTest extends TestCase {
     assertTrue(array.contains(a));
   }
 
+  @Test
   public void testSet() {
     JsonArray array = new JsonArray();
     try {
@@ -85,6 +90,7 @@ public final class JsonArrayTest extends TestCase {
     assertEquals(1, array.size());
   }
 
+  @Test
   public void testDeepCopy() {
     JsonArray original = new JsonArray();
     JsonArray firstEntry = new JsonArray();

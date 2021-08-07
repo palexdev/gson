@@ -15,29 +15,17 @@
  */
 package com.google.gson.functional;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import com.google.gson.common.TestTypes.BagOfPrimitives;
 import com.google.gson.common.TestTypes.ClassWithCustomTypeConverter;
 import com.google.gson.reflect.TypeToken;
-
-import java.util.Date;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional tests for the support of custom serializer and deserializers.
@@ -45,46 +33,42 @@ import java.util.Set;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class CustomTypeAdaptersTest extends TestCase {
+public class CustomTypeAdaptersTest {
   private GsonBuilder builder;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     builder = new GsonBuilder();
   }
 
+  @Test
   public void testCustomSerializers() {
     Gson gson = builder.registerTypeAdapter(
-        ClassWithCustomTypeConverter.class, new JsonSerializer<ClassWithCustomTypeConverter>() {
-          @Override public JsonElement serialize(ClassWithCustomTypeConverter src, Type typeOfSrc,
-              JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty("bag", 5);
-        json.addProperty("value", 25);
-        return json;
-      }
+        ClassWithCustomTypeConverter.class, (JsonSerializer<ClassWithCustomTypeConverter>) (src, typeOfSrc, context) -> {
+      JsonObject json = new JsonObject();
+      json.addProperty("bag", 5);
+      json.addProperty("value", 25);
+      return json;
     }).create();
     ClassWithCustomTypeConverter target = new ClassWithCustomTypeConverter();
     assertEquals("{\"bag\":5,\"value\":25}", gson.toJson(target));
   }
 
+  @Test
   public void testCustomDeserializers() {
     Gson gson = new GsonBuilder().registerTypeAdapter(
-        ClassWithCustomTypeConverter.class, new JsonDeserializer<ClassWithCustomTypeConverter>() {
-          @Override public ClassWithCustomTypeConverter deserialize(JsonElement json, Type typeOfT,
-              JsonDeserializationContext context) {
-        JsonObject jsonObject = json.getAsJsonObject();
-        int value = jsonObject.get("bag").getAsInt();
-        return new ClassWithCustomTypeConverter(new BagOfPrimitives(value,
-            value, false, ""), value);
-      }
+        ClassWithCustomTypeConverter.class, (JsonDeserializer<ClassWithCustomTypeConverter>) (json, typeOfT, context) -> {
+      JsonObject jsonObject = json.getAsJsonObject();
+      int value = jsonObject.get("bag").getAsInt();
+      return new ClassWithCustomTypeConverter(new BagOfPrimitives(value,
+          value, false, ""), value);
     }).create();
     String json = "{\"bag\":5,\"value\":25}";
     ClassWithCustomTypeConverter target = gson.fromJson(json, ClassWithCustomTypeConverter.class);
     assertEquals(5, target.getBag().getIntValue());
   }
 
+  @Test
   public void disable_testCustomSerializersOfSelf() {
     Gson gson = createGsonObjectWithFooTypeAdapter();
     Gson basicGson = new Gson();
@@ -95,6 +79,7 @@ public class CustomTypeAdaptersTest extends TestCase {
     assertEquals(jsonFromGson, jsonFromCustomSerializer);
   }
 
+  @Test
   public void disable_testCustomDeserializersOfSelf() {
     Gson gson = createGsonObjectWithFooTypeAdapter();
     Gson basicGson = new Gson();
@@ -106,40 +91,32 @@ public class CustomTypeAdaptersTest extends TestCase {
     assertEquals(expectedFoo.value, newFooObject.value);
   }
 
+  @Test
   public void testCustomNestedSerializers() {
     Gson gson = new GsonBuilder().registerTypeAdapter(
-        BagOfPrimitives.class, new JsonSerializer<BagOfPrimitives>() {
-          @Override public JsonElement serialize(BagOfPrimitives src, Type typeOfSrc,
-          JsonSerializationContext context) {
-        return new JsonPrimitive(6);
-      }
-    }).create();
+        BagOfPrimitives.class, (JsonSerializer<BagOfPrimitives>) (src, typeOfSrc, context) -> new JsonPrimitive(6)).create();
     ClassWithCustomTypeConverter target = new ClassWithCustomTypeConverter();
     assertEquals("{\"bag\":6,\"value\":10}", gson.toJson(target));
   }
 
+  @Test
   public void testCustomNestedDeserializers() {
     Gson gson = new GsonBuilder().registerTypeAdapter(
-        BagOfPrimitives.class, new JsonDeserializer<BagOfPrimitives>() {
-          @Override public BagOfPrimitives deserialize(JsonElement json, Type typeOfT,
-          JsonDeserializationContext context) throws JsonParseException {
-        int value = json.getAsInt();
-        return new BagOfPrimitives(value, value, false, "");
-      }
+        BagOfPrimitives.class, (JsonDeserializer<BagOfPrimitives>) (json, typeOfT, context) -> {
+      int value = json.getAsInt();
+      return new BagOfPrimitives(value, value, false, "");
     }).create();
     String json = "{\"bag\":7,\"value\":25}";
     ClassWithCustomTypeConverter target = gson.fromJson(json, ClassWithCustomTypeConverter.class);
     assertEquals(7, target.getBag().getIntValue());
   }
 
+  @Test
   public void testCustomTypeAdapterDoesNotAppliesToSubClasses() {
-    Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, new JsonSerializer<Base> () {
-      @Override
-      public JsonElement serialize(Base src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty("value", src.baseValue);
-        return json;
-      }
+    Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, (JsonSerializer<Base>) (src, typeOfSrc, context) -> {
+      JsonObject json = new JsonObject();
+      json.addProperty("value", src.baseValue);
+      return json;
     }).create();
     Base b = new Base();
     String json = gson.toJson(b);
@@ -149,14 +126,12 @@ public class CustomTypeAdaptersTest extends TestCase {
     assertTrue(json.contains("derivedValue"));
   }
 
+  @Test
   public void testCustomTypeAdapterAppliesToSubClassesSerializedAsBaseClass() {
-    Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, new JsonSerializer<Base> () {
-      @Override
-      public JsonElement serialize(Base src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty("value", src.baseValue);
-        return json;
-      }
+    Gson gson = new GsonBuilder().registerTypeAdapter(Base.class, (JsonSerializer<Base>) (src, typeOfSrc, context) -> {
+      JsonObject json = new JsonObject();
+      json.addProperty("value", src.baseValue);
+      return json;
     }).create();
     Base b = new Base();
     String json = gson.toJson(b);
@@ -208,61 +183,50 @@ public class CustomTypeAdaptersTest extends TestCase {
     }
   }
 
+  @Test
   public void testCustomSerializerInvokedForPrimitives() {
     Gson gson = new GsonBuilder()
-        .registerTypeAdapter(boolean.class, new JsonSerializer<Boolean>() {
-          @Override public JsonElement serialize(Boolean s, Type t, JsonSerializationContext c) {
-            return new JsonPrimitive(s ? 1 : 0);
-          }
-        })
+        .registerTypeAdapter(boolean.class, (JsonSerializer<Boolean>) (s, t, c) -> new JsonPrimitive(s ? 1 : 0))
         .create();
     assertEquals("1", gson.toJson(true, boolean.class));
     assertEquals("true", gson.toJson(true, Boolean.class));
   }
 
   @SuppressWarnings("rawtypes")
+  @Test
   public void testCustomDeserializerInvokedForPrimitives() {
     Gson gson = new GsonBuilder()
-        .registerTypeAdapter(boolean.class, new JsonDeserializer() {
-          @Override
-          public Object deserialize(JsonElement json, Type t, JsonDeserializationContext context) {
-            return json.getAsInt() != 0;
-          }
-        })
+        .registerTypeAdapter(boolean.class, (JsonDeserializer) (json, t, context) -> json.getAsInt() != 0)
         .create();
     assertEquals(Boolean.TRUE, gson.fromJson("1", boolean.class));
     assertEquals(Boolean.TRUE, gson.fromJson("true", Boolean.class));
   }
 
+  @Test
   public void testCustomByteArraySerializer() {
-    Gson gson = new GsonBuilder().registerTypeAdapter(byte[].class, new JsonSerializer<byte[]>() {
-      @Override
-      public JsonElement serialize(byte[] src, Type typeOfSrc, JsonSerializationContext context) {
-        StringBuilder sb = new StringBuilder(src.length);
-        for (byte b : src) {
-          sb.append(b);
-        }
-        return new JsonPrimitive(sb.toString());
+    Gson gson = new GsonBuilder().registerTypeAdapter(byte[].class, (JsonSerializer<byte[]>) (src, typeOfSrc, context) -> {
+      StringBuilder sb = new StringBuilder(src.length);
+      for (byte b : src) {
+        sb.append(b);
       }
+      return new JsonPrimitive(sb.toString());
     }).create();
     byte[] data = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     String json = gson.toJson(data);
     assertEquals("\"0123456789\"", json);
   }
 
+  @Test
   public void testCustomByteArrayDeserializerAndInstanceCreator() {
     GsonBuilder gsonBuilder = new GsonBuilder().registerTypeAdapter(byte[].class,
-        new JsonDeserializer<byte[]>() {
-          @Override public byte[] deserialize(JsonElement json,
-              Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        String str = json.getAsString();
-        byte[] data = new byte[str.length()];
-        for (int i = 0; i < data.length; ++i) {
-          data[i] = Byte.parseByte(""+str.charAt(i));
-        }
-        return data;
-      }
-    });
+            (JsonDeserializer<byte[]>) (json, typeOfT, context) -> {
+          String str = json.getAsString();
+          byte[] data = new byte[str.length()];
+          for (int i = 0; i < data.length; ++i) {
+            data[i] = Byte.parseByte(""+str.charAt(i));
+          }
+          return data;
+        });
     Gson gson = gsonBuilder.create();
     String json = "'0123456789'";
     byte[] actual = gson.fromJson(json, byte[].class);
@@ -308,31 +272,34 @@ public class CustomTypeAdaptersTest extends TestCase {
   }
 
   // Test created from Issue 70
+  @Test
   public void testCustomAdapterInvokedForCollectionElementSerializationWithType() {
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(StringHolder.class, new StringHolderTypeAdapter())
       .create();
     Type setType = new TypeToken<Set<StringHolder>>() {}.getType();
     StringHolder holder = new StringHolder("Jacob", "Tomaw");
-    Set<StringHolder> setOfHolders = new HashSet<StringHolder>();
+    Set<StringHolder> setOfHolders = new HashSet<>();
     setOfHolders.add(holder);
     String json = gson.toJson(setOfHolders, setType);
     assertTrue(json.contains("Jacob:Tomaw"));
   }
 
   // Test created from Issue 70
+  @Test
   public void testCustomAdapterInvokedForCollectionElementSerialization() {
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(StringHolder.class, new StringHolderTypeAdapter())
       .create();
     StringHolder holder = new StringHolder("Jacob", "Tomaw");
-    Set<StringHolder> setOfHolders = new HashSet<StringHolder>();
+    Set<StringHolder> setOfHolders = new HashSet<>();
     setOfHolders.add(holder);
     String json = gson.toJson(setOfHolders);
     assertTrue(json.contains("Jacob:Tomaw"));
   }
 
   // Test created from Issue 70
+  @Test
   public void testCustomAdapterInvokedForCollectionElementDeserialization() {
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(StringHolder.class, new StringHolderTypeAdapter())
@@ -346,31 +313,34 @@ public class CustomTypeAdaptersTest extends TestCase {
   }
 
   // Test created from Issue 70
+  @Test
   public void testCustomAdapterInvokedForMapElementSerializationWithType() {
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(StringHolder.class, new StringHolderTypeAdapter())
       .create();
     Type mapType = new TypeToken<Map<String,StringHolder>>() {}.getType();
     StringHolder holder = new StringHolder("Jacob", "Tomaw");
-    Map<String, StringHolder> mapOfHolders = new HashMap<String, StringHolder>();
+    Map<String, StringHolder> mapOfHolders = new HashMap<>();
     mapOfHolders.put("foo", holder);
     String json = gson.toJson(mapOfHolders, mapType);
     assertTrue(json.contains("\"foo\":\"Jacob:Tomaw\""));
   }
 
   // Test created from Issue 70
+  @Test
   public void testCustomAdapterInvokedForMapElementSerialization() {
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(StringHolder.class, new StringHolderTypeAdapter())
       .create();
     StringHolder holder = new StringHolder("Jacob", "Tomaw");
-    Map<String, StringHolder> mapOfHolders = new HashMap<String, StringHolder>();
+    Map<String, StringHolder> mapOfHolders = new HashMap<>();
     mapOfHolders.put("foo", holder);
     String json = gson.toJson(mapOfHolders);
     assertTrue(json.contains("\"foo\":\"Jacob:Tomaw\""));
   }
 
   // Test created from Issue 70
+  @Test
   public void testCustomAdapterInvokedForMapElementDeserialization() {
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(StringHolder.class, new StringHolderTypeAdapter())
@@ -383,6 +353,7 @@ public class CustomTypeAdaptersTest extends TestCase {
     assertEquals("Tomaw", foo.part2);
   }
 
+  @Test
   public void testEnsureCustomSerializerNotInvokedForNullValues() {
     Gson gson = new GsonBuilder()
         .registerTypeAdapter(DataHolder.class, new DataHolderSerializer())
@@ -392,6 +363,7 @@ public class CustomTypeAdaptersTest extends TestCase {
     assertEquals("{\"wrappedData\":{\"myData\":\"abc\"}}", json);
   }
 
+  @Test
   public void testEnsureCustomDeserializerNotInvokedForNullValues() {
     Gson gson = new GsonBuilder()
         .registerTypeAdapter(DataHolder.class, new DataHolderDeserializer())
@@ -402,6 +374,7 @@ public class CustomTypeAdaptersTest extends TestCase {
   }
 
   // Test created from Issue 352
+  @Test
   public void testRegisterHierarchyAdapterForDate() {
     Gson gson = new GsonBuilder()
         .registerTypeHierarchyAdapter(Date.class, new DateTypeAdapter())

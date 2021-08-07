@@ -19,10 +19,13 @@ package com.google.gson.internal.bind;
 import com.google.gson.Gson;
 import com.google.gson.TypeAdapter;
 import com.google.gson.internal.$Gson$Types;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.PrintStream;
 import java.lang.ref.WeakReference;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Test fixes for infinite recursion on {@link $Gson$Types#resolve(java.lang.reflect.Type, Class,
@@ -32,7 +35,7 @@ import java.lang.ref.WeakReference;
  * These tests originally caused {@link StackOverflowError} because of infinite recursion on attempts to
  * resolve generics on types, with an intermediate types like 'Foo2&lt;? extends ? super ? extends ... ? extends A&gt;'
  */
-public class RecursiveTypesResolveTest extends TestCase {
+public class RecursiveTypesResolveTest {
 
   @SuppressWarnings("unused")
   private static class Foo1<A> {
@@ -46,7 +49,7 @@ public class RecursiveTypesResolveTest extends TestCase {
   /**
    * Test simplest case of recursion.
    */
-
+  @Test
   public void testRecursiveResolveSimple() {
     TypeAdapter<Foo1> adapter = new Gson().getAdapter(Foo1.class);
     assertNotNull(adapter);
@@ -55,13 +58,14 @@ public class RecursiveTypesResolveTest extends TestCase {
   /**
    * Real-world samples, found in Issues #603 and #440.
    */
-
+  @Test
   public void testIssue603PrintStream() {
     TypeAdapter<PrintStream> adapter = new Gson().getAdapter(PrintStream.class);
     assertNotNull(adapter);
   }
 
-  public void testIssue440WeakReference() throws Exception {
+  @Test
+  public void testIssue440WeakReference() {
     TypeAdapter<WeakReference> adapter = new Gson().getAdapter(WeakReference.class);
     assertNotNull(adapter);
   }
@@ -69,22 +73,25 @@ public class RecursiveTypesResolveTest extends TestCase {
   /**
    * Tests belows check the behaviour of the methods changed for the fix.
    */
-
+  @Test
   public void testDoubleSupertype() {
     assertEquals($Gson$Types.supertypeOf(Number.class),
             $Gson$Types.supertypeOf($Gson$Types.supertypeOf(Number.class)));
   }
 
+  @Test
   public void testDoubleSubtype() {
     assertEquals($Gson$Types.subtypeOf(Number.class),
             $Gson$Types.subtypeOf($Gson$Types.subtypeOf(Number.class)));
   }
 
+  @Test
   public void testSuperSubtype() {
     assertEquals($Gson$Types.subtypeOf(Object.class),
             $Gson$Types.supertypeOf($Gson$Types.subtypeOf(Number.class)));
   }
 
+  @Test
   public void testSubSupertype() {
     assertEquals($Gson$Types.subtypeOf(Object.class),
             $Gson$Types.subtypeOf($Gson$Types.supertypeOf(Number.class)));
@@ -104,12 +111,14 @@ public class RecursiveTypesResolveTest extends TestCase {
     TestType2<? super Y, ? super X> superReversedType;
   }
 
-  public void testRecursiveTypeVariablesResolve1() throws Exception {
+  @Test
+  public void testRecursiveTypeVariablesResolve1() {
     TypeAdapter<TestType> adapter = new Gson().getAdapter(TestType.class);
     assertNotNull(adapter);
   }
 
-  public void testRecursiveTypeVariablesResolve12() throws Exception {
+  @Test
+  public void testRecursiveTypeVariablesResolve12() {
     TypeAdapter<TestType2> adapter = new Gson().getAdapter(TestType2.class);
     assertNotNull(adapter);
   }

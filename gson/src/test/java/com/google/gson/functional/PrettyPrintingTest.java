@@ -15,20 +15,19 @@
  */
 package com.google.gson.functional;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import junit.framework.TestCase;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.common.TestTypes.ArrayOfObjects;
 import com.google.gson.common.TestTypes.BagOfPrimitives;
 import com.google.gson.reflect.TypeToken;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Type;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for pretty printing option.
@@ -36,21 +35,21 @@ import com.google.gson.reflect.TypeToken;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class PrettyPrintingTest extends TestCase {
+public class PrettyPrintingTest {
 
   private static final boolean DEBUG = false;
 
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new GsonBuilder().setPrettyPrinting().create();
   }
 
+  @Test
   public void testPrettyPrintList() {
     BagOfPrimitives b = new BagOfPrimitives();
-    List<BagOfPrimitives> listOfB = new LinkedList<BagOfPrimitives>();
+    List<BagOfPrimitives> listOfB = new LinkedList<>();
     for (int i = 0; i < 15; ++i) {
       listOfB.add(b);
     }
@@ -59,18 +58,21 @@ public class PrettyPrintingTest extends TestCase {
     print(json);
   }
 
+  @Test
   public void testPrettyPrintArrayOfObjects() {
     ArrayOfObjects target = new ArrayOfObjects();
     String json = gson.toJson(target);
     print(json);
   }
 
+  @Test
   public void testPrettyPrintArrayOfPrimitives() {
     int[] ints = new int[] { 1, 2, 3, 4, 5 };
     String json = gson.toJson(ints);
     assertEquals("[\n  1,\n  2,\n  3,\n  4,\n  5\n]", json);
   }
 
+  @Test
   public void testPrettyPrintArrayOfPrimitiveArrays() {
     int[][] ints = new int[][] { { 1, 2 }, { 3, 4 }, { 5, 6 }, { 7, 8 },
         { 9, 0 }, { 10 } };
@@ -79,6 +81,7 @@ public class PrettyPrintingTest extends TestCase {
         + "\n  [\n    7,\n    8\n  ],\n  [\n    9,\n    0\n  ],\n  [\n    10\n  ]\n]", json);
   }
 
+  @Test
   public void testPrettyPrintListOfPrimitiveArrays() {
     List<Integer[]> list = Arrays.asList(new Integer[][] { { 1, 2 }, { 3, 4 },
         { 5, 6 }, { 7, 8 }, { 9, 0 }, { 10 } });
@@ -86,9 +89,10 @@ public class PrettyPrintingTest extends TestCase {
     assertEquals("[\n  [\n    1,\n    2\n  ],\n  [\n    3,\n    4\n  ],\n  [\n    5,\n    6\n  ],"
         + "\n  [\n    7,\n    8\n  ],\n  [\n    9,\n    0\n  ],\n  [\n    10\n  ]\n]", json);
   }
-  
+
+  @Test
   public void testMap() {
-    Map<String, Integer> map = new LinkedHashMap<String, Integer>();
+    Map<String, Integer> map = new LinkedHashMap<>();
     map.put("abc", 1);
     map.put("def", 5);
     String json = gson.toJson(map);
@@ -96,9 +100,10 @@ public class PrettyPrintingTest extends TestCase {
   }
 
   // In response to bug 153
+  @Test
   public void testEmptyMapField() {
     ClassWithMap obj = new ClassWithMap();
-    obj.map = new LinkedHashMap<String, Integer>();
+    obj.map = new LinkedHashMap<>();
     String json = gson.toJson(obj);
     assertTrue(json.contains("{\n  \"map\": {},\n  \"value\": 2\n}"));
   }
@@ -109,6 +114,7 @@ public class PrettyPrintingTest extends TestCase {
     int value = 2;
   }
 
+  @Test
   public void testMultipleArrays() {
     int[][][] ints = new int[][][] { { { 1 }, { 2 } } };
     String json = gson.toJson(ints);

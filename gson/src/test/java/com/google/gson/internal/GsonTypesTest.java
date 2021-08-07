@@ -16,15 +16,18 @@
 
 package com.google.gson.internal;
 
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
-public final class GsonTypesTest extends TestCase {
+public final class GsonTypesTest {
 
-  public void testNewParameterizedTypeWithoutOwner() throws Exception {
+  @Test
+  public void testNewParameterizedTypeWithoutOwner() {
     // List<A>. List is a top-level class
     Type type = $Gson$Types.newParameterizedTypeWithOwner(null, List.class, A.class);
     assertEquals(A.class, getFirstTypeArgument(type));
@@ -46,7 +49,8 @@ public final class GsonTypesTest extends TestCase {
     assertEquals(D.class, getFirstTypeArgument(type));
   }
 
-  public void testGetFirstTypeArgument() throws Exception {
+  @Test
+  public void testGetFirstTypeArgument() {
     assertNull(getFirstTypeArgument(A.class));
 
     Type type = $Gson$Types.newParameterizedTypeWithOwner(null, A.class, B.class, C.class);
@@ -64,7 +68,7 @@ public final class GsonTypesTest extends TestCase {
    * Given a parameterized type A&lt;B,C&gt;, returns B. If the specified type is not
    * a generic type, returns null.
    */
-  public static Type getFirstTypeArgument(Type type) throws Exception {
+  public static Type getFirstTypeArgument(Type type) {
     if (!(type instanceof ParameterizedType)) return null;
     ParameterizedType ptype = (ParameterizedType) type;
     Type[] actualTypeArguments = ptype.getActualTypeArguments();

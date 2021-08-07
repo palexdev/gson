@@ -17,20 +17,21 @@
 package com.google.gson.functional;
 
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests for internationalized strings.
  *
  * @author Inderjeet Singh
  */
-public class InternationalizationTest extends TestCase {
+public class InternationalizationTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
@@ -43,28 +44,32 @@ public class InternationalizationTest extends TestCase {
   }
   */
 
-  public void testStringsWithRawChineseCharactersDeserialization() throws Exception {
+  @Test
+  public void testStringsWithRawChineseCharactersDeserialization() {
     String expected = "好好好";
     String json = "\"" + expected + "\"";
     String actual = gson.fromJson(json, String.class);
     assertEquals(expected, actual);
   }
 
-  public void testStringsWithUnicodeChineseCharactersSerialization() throws Exception {
+  @Test
+  public void testStringsWithUnicodeChineseCharactersSerialization() {
     String target = "\u597d\u597d\u597d";
     String json = gson.toJson(target);
     String expected = "\"\u597d\u597d\u597d\"";
     assertEquals(expected, json);
   }
 
-  public void testStringsWithUnicodeChineseCharactersDeserialization() throws Exception {
+  @Test
+  public void testStringsWithUnicodeChineseCharactersDeserialization() {
     String expected = "\u597d\u597d\u597d";
     String json = "\"" + expected + "\"";
     String actual = gson.fromJson(json, String.class);
     assertEquals(expected, actual);
   }
 
-  public void testStringsWithUnicodeChineseCharactersEscapedDeserialization() throws Exception {
+  @Test
+  public void testStringsWithUnicodeChineseCharactersEscapedDeserialization() {
     String actual = gson.fromJson("'\\u597d\\u597d\\u597d'", String.class);
     assertEquals("\u597d\u597d\u597d", actual);
   }

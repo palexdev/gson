@@ -15,19 +15,18 @@
  */
 package com.google.gson.functional;
 
-import java.lang.reflect.Type;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializer;
+import com.google.gson.common.TestTypes.ClassOverridingEquals;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
-import junit.framework.TestCase;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.common.TestTypes.ClassOverridingEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional tests related to circular reference detection and error reporting.
@@ -35,16 +34,16 @@ import com.google.gson.common.TestTypes.ClassOverridingEquals;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class CircularReferenceTest extends TestCase {
+public class CircularReferenceTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
-  public void testCircularSerialization() throws Exception {
+  @Test
+  public void testCircularSerialization() {
     ContainsReferenceToSelfType a = new ContainsReferenceToSelfType();
     ContainsReferenceToSelfType b = new ContainsReferenceToSelfType();
     a.children.add(b);
@@ -56,7 +55,8 @@ public class CircularReferenceTest extends TestCase {
     }
   }
 
-  public void testSelfReferenceIgnoredInSerialization() throws Exception {
+  @Test
+  public void testSelfReferenceIgnoredInSerialization() {
     ClassOverridingEquals objA = new ClassOverridingEquals();
     objA.ref = objA;
 
@@ -64,7 +64,8 @@ public class CircularReferenceTest extends TestCase {
     assertFalse(json.contains("ref")); // self-reference is ignored
   }
 
-  public void testSelfReferenceArrayFieldSerialization() throws Exception {
+  @Test
+  public void testSelfReferenceArrayFieldSerialization() {
     ClassWithSelfReferenceArray objA = new ClassWithSelfReferenceArray();
     objA.children = new ClassWithSelfReferenceArray[]{objA};
 
@@ -75,17 +76,15 @@ public class CircularReferenceTest extends TestCase {
     }
   }
 
-  public void testSelfReferenceCustomHandlerSerialization() throws Exception {
+  @Test
+  public void testSelfReferenceCustomHandlerSerialization() {
     ClassWithSelfReference obj = new ClassWithSelfReference();
     obj.child = obj;
-    Gson gson = new GsonBuilder().registerTypeAdapter(ClassWithSelfReference.class, new JsonSerializer<ClassWithSelfReference>() {
-      public JsonElement serialize(ClassWithSelfReference src, Type typeOfSrc,
-          JsonSerializationContext context) {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("property", "value");
-        obj.add("child", context.serialize(src.child));
-        return obj;
-      }
+    Gson gson = new GsonBuilder().registerTypeAdapter(ClassWithSelfReference.class, (JsonSerializer<ClassWithSelfReference>) (src, typeOfSrc, context) -> {
+      JsonObject obj1 = new JsonObject();
+      obj1.addProperty("property", "value");
+      obj1.add("child", context.serialize(src.child));
+      return obj1;
     }).create();
     try {
       gson.toJson(obj);
@@ -94,7 +93,8 @@ public class CircularReferenceTest extends TestCase {
     }
   }
 
-  public void testDirectedAcyclicGraphSerialization() throws Exception {
+  @Test
+  public void testDirectedAcyclicGraphSerialization() {
     ContainsReferenceToSelfType a = new ContainsReferenceToSelfType();
     ContainsReferenceToSelfType b = new ContainsReferenceToSelfType();
     ContainsReferenceToSelfType c = new ContainsReferenceToSelfType();
@@ -104,7 +104,8 @@ public class CircularReferenceTest extends TestCase {
     assertNotNull(gson.toJson(a));
   }
 
-  public void testDirectedAcyclicGraphDeserialization() throws Exception {
+  @Test
+  public void testDirectedAcyclicGraphDeserialization() {
     String json = "{\"children\":[{\"children\":[{\"children\":[]}]},{\"children\":[]}]}";
     ContainsReferenceToSelfType target = gson.fromJson(json, ContainsReferenceToSelfType.class);
     assertNotNull(target);
@@ -112,7 +113,7 @@ public class CircularReferenceTest extends TestCase {
   }
 
   private static class ContainsReferenceToSelfType {
-    Collection<ContainsReferenceToSelfType> children = new ArrayList<ContainsReferenceToSelfType>();
+    Collection<ContainsReferenceToSelfType> children = new ArrayList<>();
   }
 
   private static class ClassWithSelfReference {

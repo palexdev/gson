@@ -18,12 +18,14 @@ package com.google.gson;
 
 import com.google.gson.internal.$Gson$Types;
 import com.google.gson.reflect.TypeToken;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for the {@code GenericArrayType}s created by the {@link $Gson$Types} class.
@@ -31,16 +33,16 @@ import java.util.List;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class GenericArrayTypeTest extends TestCase {
+public class GenericArrayTypeTest {
   private GenericArrayType ourType;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     ourType = $Gson$Types.arrayOf($Gson$Types.newParameterizedTypeWithOwner(null, List.class, String.class));
   }
 
-  public void testOurTypeFunctionality() throws Exception {
+  @Test
+  public void testOurTypeFunctionality() {
     Type parameterizedType = new TypeToken<List<String>>() {}.getType();
     Type genericArrayType = new TypeToken<List<String>[]>() {}.getType();
 
@@ -49,9 +51,10 @@ public class GenericArrayTypeTest extends TestCase {
     assertEquals(genericArrayType.hashCode(), ourType.hashCode());
   }
 
-  public void testNotEquals() throws Exception {
+  @Test
+  public void testNotEquals() {
     Type differentGenericArrayType = new TypeToken<List<String>[][]>() {}.getType();
-    assertFalse(differentGenericArrayType.equals(ourType));
-    assertFalse(ourType.equals(differentGenericArrayType));
+    assertNotEquals(differentGenericArrayType, ourType);
+    assertNotEquals(ourType, differentGenericArrayType);
   }
 }

@@ -15,13 +15,16 @@
  */
 package com.google.gson.internal;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test unsafe allocator instantiation
  * @author Ugljesa Jovanovic
  */
-public final class UnsafeAllocatorInstantiationTest extends TestCase {
+public final class UnsafeAllocatorInstantiationTest {
 
   public interface Interface {
   }
@@ -36,6 +39,7 @@ public final class UnsafeAllocatorInstantiationTest extends TestCase {
    * Ensure that the {@link java.lang.UnsupportedOperationException} is thrown when trying
    * to instantiate an interface
    */
+  @Test
   public void testInterfaceInstantiation() {
     UnsafeAllocator unsafeAllocator = UnsafeAllocator.create();
     try {
@@ -50,6 +54,7 @@ public final class UnsafeAllocatorInstantiationTest extends TestCase {
    * Ensure that the {@link java.lang.UnsupportedOperationException} is thrown when trying
    * to instantiate an abstract class
    */
+  @Test
   public void testAbstractClassInstantiation() {
     UnsafeAllocator unsafeAllocator = UnsafeAllocator.create();
     try {
@@ -63,6 +68,7 @@ public final class UnsafeAllocatorInstantiationTest extends TestCase {
   /**
    * Ensure that no exception is thrown when trying to instantiate a concrete class
    */
+  @Test
   public void testConcreteClassInstantiation() {
     UnsafeAllocator unsafeAllocator = UnsafeAllocator.create();
     try {

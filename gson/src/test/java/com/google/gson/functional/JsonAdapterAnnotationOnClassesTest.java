@@ -16,31 +16,24 @@
 
 package com.google.gson.functional;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.TypeAdapter;
-import com.google.gson.TypeAdapterFactory;
+import com.google.gson.*;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.Locale;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional tests for the {@link com.google.gson.annotations.JsonAdapter} annotation on classes.
  */
-public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
+public final class JsonAdapterAnnotationOnClassesTest {
 
+  @Test
   public void testJsonAdapterInvoked() {
     Gson gson = new Gson();
     String json = gson.toJson(new A("bar"));
@@ -59,6 +52,7 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
     assertEquals(Foo.BAZ, baz);
   }
 
+  @Test
   public void testJsonAdapterFactoryInvoked() {
     Gson gson = new Gson();
     String json = gson.toJson(new C("bar"));
@@ -67,12 +61,16 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
     assertEquals("jsonAdapterFactory", c.value);
   }
 
+  @Test
   public void testRegisteredAdapterOverridesJsonAdapter() {
-    TypeAdapter<A> typeAdapter = new TypeAdapter<A>() {
-      @Override public void write(JsonWriter out, A value) throws IOException {
+    TypeAdapter<A> typeAdapter = new TypeAdapter<>() {
+      @Override
+      public void write(JsonWriter out, A value) throws IOException {
         out.value("registeredAdapter");
       }
-      @Override public A read(JsonReader in) throws IOException {
+
+      @Override
+      public A read(JsonReader in) throws IOException {
         return new A(in.nextString());
       }
     };
@@ -86,13 +84,9 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
   /**
    * The serializer overrides field adapter, but for deserializer the fieldAdapter is used.
    */
+  @Test
   public void testRegisteredSerializerOverridesJsonAdapter() {
-    JsonSerializer<A> serializer = new JsonSerializer<A>() {
-      public JsonElement serialize(A src, Type typeOfSrc,
-          JsonSerializationContext context) {
-        return new JsonPrimitive("registeredSerializer");
-      }
-    };
+    JsonSerializer<A> serializer = (src, typeOfSrc, context) -> new JsonPrimitive("registeredSerializer");
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(A.class, serializer)
       .create();
@@ -105,13 +99,9 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
   /**
    * The deserializer overrides Json adapter, but for serializer the jsonAdapter is used.
    */
+  @Test
   public void testRegisteredDeserializerOverridesJsonAdapter() {
-    JsonDeserializer<A> deserializer = new JsonDeserializer<A>() {
-      public A deserialize(JsonElement json, Type typeOfT,
-          JsonDeserializationContext context) throws JsonParseException {
-        return new A("registeredDeserializer");
-      }
-    };
+    JsonDeserializer<A> deserializer = (json, typeOfT, context) -> new A("registeredDeserializer");
     Gson gson = new GsonBuilder()
       .registerTypeAdapter(A.class, deserializer)
       .create();
@@ -121,6 +111,7 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
     assertEquals("registeredDeserializer", target.value);
   }
 
+  @Test
   public void testIncorrectTypeAdapterFails() {
     try {
       String json = new Gson().toJson(new ClassWithIncorrectJsonAdapter("bar"));
@@ -128,11 +119,13 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
     } catch (ClassCastException expected) {}
   }
 
+  @Test
   public void testSuperclassTypeAdapterNotInvoked() {
     String json = new Gson().toJson(new B("bar"));
     assertFalse(json.contains("jsonAdapter"));
   }
 
+  @Test
   public void testNullSafeObjectFromJson() {
     Gson gson = new Gson();
     NullableClass fromJson = gson.fromJson("null", NullableClass.class);
@@ -164,12 +157,15 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
     }
     static final class JsonAdapterFactory implements TypeAdapterFactory {
       @Override public <T> TypeAdapter<T> create(Gson gson, final TypeToken<T> type) {
-        return new TypeAdapter<T>() {
-          @Override public void write(JsonWriter out, T value) throws IOException {
+        return new TypeAdapter<>() {
+          @Override
+          public void write(JsonWriter out, T value) throws IOException {
             out.value("jsonAdapterFactory");
           }
+
           @SuppressWarnings("unchecked")
-          @Override public T read(JsonReader in) throws IOException {
+          @Override
+          public T read(JsonReader in) throws IOException {
             in.nextString();
             return (T) new C("jsonAdapterFactory");
           }
@@ -239,7 +235,7 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
   }
 
   @JsonAdapter(FooJsonAdapter.class)
-  private static enum Foo { BAR, BAZ }
+  private enum Foo { BAR, BAZ }
   private static class FooJsonAdapter extends TypeAdapter<Foo> {
     @Override public void write(JsonWriter out, Foo value) throws IOException {
       out.value(value.name().toLowerCase(Locale.US));
@@ -250,6 +246,7 @@ public final class JsonAdapterAnnotationOnClassesTest extends TestCase {
     }
   }
 
+  @Test
   public void testIncorrectJsonAdapterType() {
     try {
       new Gson().toJson(new D());

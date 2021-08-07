@@ -1,16 +1,15 @@
 package com.google.gson.functional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * This test covers the scenario described in #1390 where a type variable needs to be used
@@ -21,7 +20,7 @@ public class ReusedTypeVariablesFullyResolveTest {
 
   private Gson gson;
 
-  @Before
+  @BeforeEach
   public void setUp() {
     gson = new GsonBuilder().create();
   }

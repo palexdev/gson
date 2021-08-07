@@ -18,8 +18,10 @@ package com.google.gson.functional;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Performs some functional testing to ensure GSON infrastructure properly serializes/deserializes
@@ -28,50 +30,52 @@ import junit.framework.TestCase;
  *
  * @author Joel Leitch
  */
-public class FieldExclusionTest extends TestCase {
+public class FieldExclusionTest {
   private static final String VALUE = "blah_1234";
 
   private Outer outer;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     outer = new Outer();
   }
 
-  public void testDefaultInnerClassExclusion() throws Exception {
+  @Test
+  public void testDefaultInnerClassExclusion() {
     Gson gson = new Gson();
-    Outer.Inner target = outer.new Inner(VALUE);
+    Outer.Inner target = new Outer.Inner(VALUE);
     String result = gson.toJson(target);
     assertEquals(target.toJson(), result);
 
     gson = new GsonBuilder().create();
-    target = outer.new Inner(VALUE);
+    target = new Outer.Inner(VALUE);
     result = gson.toJson(target);
     assertEquals(target.toJson(), result);
   }
 
-  public void testInnerClassExclusion() throws Exception {
+  @Test
+  public void testInnerClassExclusion() {
     Gson gson = new GsonBuilder().disableInnerClassSerialization().create();
-    Outer.Inner target = outer.new Inner(VALUE);
+    Outer.Inner target = new Outer.Inner(VALUE);
     String result = gson.toJson(target);
     assertEquals("null", result);
   }
 
-  public void testDefaultNestedStaticClassIncluded() throws Exception {
+  @Test
+  public void testDefaultNestedStaticClassIncluded() {
     Gson gson = new Gson();
-    Outer.Inner target = outer.new Inner(VALUE);
+    Outer.Inner target = new Outer.Inner(VALUE);
     String result = gson.toJson(target);
     assertEquals(target.toJson(), result);
 
     gson = new GsonBuilder().create();
-    target = outer.new Inner(VALUE);
+    target = new Outer.Inner(VALUE);
     result = gson.toJson(target);
     assertEquals(target.toJson(), result);
   }
 
   private static class Outer {
-    private class Inner extends NestedClass {
+    private static class Inner extends NestedClass {
       public Inner(String value) {
         super(value);
       }

@@ -54,22 +54,14 @@ public class ParameterizedTypeFixtures {
       if (Primitives.isWrapperType(Primitives.wrap(clazz))) {
         return obj.toString();
       } else if (obj.getClass().equals(String.class)) {
-        return "\"" + obj.toString() + "\"";
+        return "\"" + obj + "\"";
       } else {
         // Try invoking a getExpectedJson() method if it exists
         try {
           Method method = clazz.getMethod("getExpectedJson");
           Object results = method.invoke(obj);
           return (String) results;
-        } catch (SecurityException e) {
-          throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-          throw new RuntimeException(e);
-        } catch (IllegalArgumentException e) {
-          throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-          throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
+        } catch (SecurityException | NoSuchMethodException | IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
           throw new RuntimeException(e);
         }
       }
@@ -94,13 +86,8 @@ public class ParameterizedTypeFixtures {
       }
       MyParameterizedType<T> other = (MyParameterizedType<T>) obj;
       if (value == null) {
-        if (other.value != null) {
-          return false;
-        }
-      } else if (!value.equals(other.value)) {
-        return false;
-      }
-      return true;
+        return other.value == null;
+      } else return value.equals(other.value);
     }
   }
 
@@ -113,13 +100,12 @@ public class ParameterizedTypeFixtures {
      * This is usually fine in tests since there we deserialize just once, but quite
      * dangerous in practice.
      *
-     * @param instanceOfT
      */
     public MyParameterizedTypeInstanceCreator(T instanceOfT) {
       this.instanceOfT = instanceOfT;
     }
     @Override public MyParameterizedType<T> createInstance(Type type) {
-      return new MyParameterizedType<T>(instanceOfT);
+      return new MyParameterizedType<>(instanceOfT);
     }
   }
 
@@ -134,7 +120,7 @@ public class ParameterizedTypeFixtures {
       if (addQuotes) {
         sb.append("\"");
       }
-      sb.append(obj.value.toString());
+      sb.append(obj.value);
       if (addQuotes) {
         sb.append("\"");
       }
@@ -171,7 +157,7 @@ public class ParameterizedTypeFixtures {
         PrimitiveTypeAdapter typeAdapter = new PrimitiveTypeAdapter();
         value = (T) typeAdapter.adaptType(value, rawType);
       }
-      return new MyParameterizedType<T>(value);
+      return new MyParameterizedType<>(value);
     }
   }
 }

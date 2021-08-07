@@ -18,13 +18,15 @@ package com.google.gson.functional;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for Gson serialization of a sub-class object while encountering a base-class type
@@ -32,15 +34,15 @@ import java.util.Map;
  * @author Inderjeet Singh
  */
 @SuppressWarnings("unused")
-public class MoreSpecificTypeSerializationTest extends TestCase {
+public class MoreSpecificTypeSerializationTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
+  @Test
   public void testSubclassFields() {
     ClassWithBaseFields target = new ClassWithBaseFields(new Sub(1, 2));
     String json = gson.toJson(target);
@@ -48,18 +50,20 @@ public class MoreSpecificTypeSerializationTest extends TestCase {
     assertTrue(json.contains("\"s\":2"));
   }
 
+  @Test
   public void testListOfSubclassFields() {
-    Collection<Base> list = new ArrayList<Base>();
+    Collection<Base> list = new ArrayList<>();
     list.add(new Base(1));
     list.add(new Sub(2, 3));
     ClassWithContainersOfBaseFields target = new ClassWithContainersOfBaseFields(list, null);
     String json = gson.toJson(target);
-    assertTrue(json, json.contains("{\"b\":1}"));
-    assertTrue(json, json.contains("{\"s\":3,\"b\":2}"));
+    assertTrue(json.contains("{\"b\":1}"));
+    assertTrue(json.contains("{\"s\":3,\"b\":2}"));
   }
 
+  @Test
   public void testMapOfSubclassFields() {
-    Map<String, Base> map = new HashMap<String, Base>();
+    Map<String, Base> map = new HashMap<>();
     map.put("base", new Base(1));
     map.put("sub", new Sub(2, 3));
     ClassWithContainersOfBaseFields target = new ClassWithContainersOfBaseFields(null, map);
@@ -73,9 +77,10 @@ public class MoreSpecificTypeSerializationTest extends TestCase {
   /**
    * For parameterized type, Gson ignores the more-specific type and sticks to the declared type
    */
+  @Test
   public void testParameterizedSubclassFields() {
     ClassWithParameterizedBaseFields target = new ClassWithParameterizedBaseFields(
-        new ParameterizedSub<String>("one", "two"));
+            new ParameterizedSub<>("one", "two"));
     String json = gson.toJson(target);
     assertTrue(json.contains("\"t\":\"one\""));
     assertFalse(json.contains("\"s\""));
@@ -85,25 +90,27 @@ public class MoreSpecificTypeSerializationTest extends TestCase {
    * For parameterized type in a List, Gson ignores the more-specific type and sticks to
    * the declared type
    */
+  @Test
   public void testListOfParameterizedSubclassFields() {
-    Collection<ParameterizedBase<String>> list = new ArrayList<ParameterizedBase<String>>();
-    list.add(new ParameterizedBase<String>("one"));
-    list.add(new ParameterizedSub<String>("two", "three"));
+    Collection<ParameterizedBase<String>> list = new ArrayList<>();
+    list.add(new ParameterizedBase<>("one"));
+    list.add(new ParameterizedSub<>("two", "three"));
     ClassWithContainersOfParameterizedBaseFields target =
       new ClassWithContainersOfParameterizedBaseFields(list, null);
     String json = gson.toJson(target);
-    assertTrue(json, json.contains("{\"t\":\"one\"}"));
-    assertFalse(json, json.contains("\"s\":"));
+    assertTrue(json.contains("{\"t\":\"one\"}"));
+    assertFalse(json.contains("\"s\":"));
   }
 
   /**
    * For parameterized type in a map, Gson ignores the more-specific type and sticks to the
    * declared type
    */
+  @Test
   public void testMapOfParameterizedSubclassFields() {
-    Map<String, ParameterizedBase<String>> map = new HashMap<String, ParameterizedBase<String>>();
-    map.put("base", new ParameterizedBase<String>("one"));
-    map.put("sub", new ParameterizedSub<String>("two", "three"));
+    Map<String, ParameterizedBase<String>> map = new HashMap<>();
+    map.put("base", new ParameterizedBase<>("one"));
+    map.put("sub", new ParameterizedSub<>("two", "three"));
     ClassWithContainersOfParameterizedBaseFields target =
       new ClassWithContainersOfParameterizedBaseFields(null, map);
     JsonObject json = gson.toJsonTree(target).getAsJsonObject().get("map").getAsJsonObject();

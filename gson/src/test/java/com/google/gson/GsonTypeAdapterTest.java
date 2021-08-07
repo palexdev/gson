@@ -16,11 +16,16 @@
 
 package com.google.gson;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Contains numerous tests involving registered type converters with a Gson instance.
@@ -28,26 +33,27 @@ import junit.framework.TestCase;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class GsonTypeAdapterTest extends TestCase {
+public class GsonTypeAdapterTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new GsonBuilder()
         .registerTypeAdapter(AtomicLong.class, new ExceptionTypeAdapter())
         .registerTypeAdapter(AtomicInteger.class, new AtomicIntegerTypeAdapter())
         .create();
   }
 
-  public void testDefaultTypeAdapterThrowsParseException() throws Exception {
+  @Test
+  public void testDefaultTypeAdapterThrowsParseException() {
     try {
       gson.fromJson("{\"abc\":123}", BigInteger.class);
       fail("Should have thrown a JsonParseException");
     } catch (JsonParseException expected) { }
   }
 
-  public void testTypeAdapterThrowsException() throws Exception {
+  @Test
+  public void testTypeAdapterThrowsException() {
     try {
       gson.toJson(new AtomicLong(0));
       fail("Type Adapter should have thrown an exception");
@@ -59,7 +65,8 @@ public class GsonTypeAdapterTest extends TestCase {
     } catch (JsonParseException expected) { }
   }
 
-  public void testTypeAdapterProperlyConvertsTypes() throws Exception {
+  @Test
+  public void testTypeAdapterProperlyConvertsTypes() {
     int intialValue = 1;
     AtomicInteger atomicInt = new AtomicInteger(intialValue);
     String json = gson.toJson(atomicInt);
@@ -69,7 +76,8 @@ public class GsonTypeAdapterTest extends TestCase {
     assertEquals(intialValue, atomicInt.get());
   }
 
-  public void testTypeAdapterDoesNotAffectNonAdaptedTypes() throws Exception {
+  @Test
+  public void testTypeAdapterDoesNotAffectNonAdaptedTypes() {
     String expected = "blah";
     String actual = gson.toJson(expected);
     assertEquals("\"" + expected + "\"", actual);
@@ -113,6 +121,7 @@ public class GsonTypeAdapterTest extends TestCase {
   }
 
   // https://groups.google.com/d/topic/google-gson/EBmOCa8kJPE/discussion
+  @Test
   public void testDeserializerForAbstractClass() {
     Concrete instance = new Concrete();
     instance.a = "android";
@@ -129,11 +138,8 @@ public class GsonTypeAdapterTest extends TestCase {
 
   private void assertSerialized(String expected, Class<?> instanceType, boolean registerAbstractDeserializer,
       boolean registerAbstractHierarchyDeserializer, Object instance) {
-    JsonDeserializer<Abstract> deserializer = new JsonDeserializer<Abstract>() {
-      public Abstract deserialize(JsonElement json, Type typeOfT,
-          JsonDeserializationContext context) throws JsonParseException {
-        throw new AssertionError();
-      }
+    JsonDeserializer<Abstract> deserializer = (json, typeOfT, context) -> {
+      throw new AssertionError();
     };
     GsonBuilder builder = new GsonBuilder();
     if (registerAbstractDeserializer) {

@@ -18,28 +18,34 @@ package com.google.gson;
 
 import com.google.gson.annotations.Since;
 import com.google.gson.internal.Excluder;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link Excluder} class.
  *
  * @author Joel Leitch
  */
-public class VersionExclusionStrategyTest extends TestCase {
+public class VersionExclusionStrategyTest {
   private static final double VERSION = 5.0D;
 
+  @Test
   public void testClassAndFieldAreAtSameVersion() throws Exception {
     Excluder excluder = Excluder.DEFAULT.withVersion(VERSION);
     assertFalse(excluder.excludeClass(MockObject.class, true));
     assertFalse(excluder.excludeField(MockObject.class.getField("someField"), true));
   }
 
+  @Test
   public void testClassAndFieldAreBehindInVersion() throws Exception {
     Excluder excluder = Excluder.DEFAULT.withVersion(VERSION + 1);
     assertFalse(excluder.excludeClass(MockObject.class, true));
     assertFalse(excluder.excludeField(MockObject.class.getField("someField"), true));
   }
 
+  @Test
   public void testClassAndFieldAreAheadInVersion() throws Exception {
     Excluder excluder = Excluder.DEFAULT.withVersion(VERSION - 1);
     assertTrue(excluder.excludeClass(MockObject.class, true));

@@ -19,15 +19,18 @@ package com.google.gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
-import junit.framework.TestCase;
 
-public final class MixedStreamTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public final class MixedStreamTest {
 
   private static final Car BLUE_MUSTANG = new Car("mustang", 0x0000FF);
   private static final Car BLACK_BMW = new Car("bmw", 0x000000);
@@ -47,6 +50,7 @@ public final class MixedStreamTest extends TestCase {
       + "  }\n"
       + "]";
 
+  @Test
   public void testWriteMixedStreamed() throws IOException {
     Gson gson = new Gson();
     StringWriter stringWriter = new StringWriter();
@@ -62,6 +66,7 @@ public final class MixedStreamTest extends TestCase {
     assertEquals(CARS_JSON, stringWriter.toString());
   }
 
+  @Test
   public void testReadMixedStreamed() throws IOException {
     Gson gson = new Gson();
     StringReader stringReader = new StringReader(CARS_JSON);
@@ -74,6 +79,7 @@ public final class MixedStreamTest extends TestCase {
     jsonReader.endArray();
   }
 
+  @Test
   public void testReaderDoesNotMutateState() throws IOException {
     Gson gson = new Gson();
     JsonReader jsonReader = new JsonReader(new StringReader(CARS_JSON));
@@ -88,6 +94,7 @@ public final class MixedStreamTest extends TestCase {
     assertTrue(jsonReader.isLenient());
   }
 
+  @Test
   public void testWriteDoesNotMutateState() throws IOException {
     Gson gson = new Gson();
     JsonWriter jsonWriter = new JsonWriter(new StringWriter());
@@ -106,6 +113,7 @@ public final class MixedStreamTest extends TestCase {
     assertFalse(jsonWriter.isLenient());
   }
 
+  @Test
   public void testReadInvalidState() throws IOException {
     Gson gson = new Gson();
     JsonReader jsonReader = new JsonReader(new StringReader(CARS_JSON));
@@ -118,6 +126,7 @@ public final class MixedStreamTest extends TestCase {
     }
   }
 
+  @Test
   public void testReadClosed() throws IOException {
     Gson gson = new Gson();
     JsonReader jsonReader = new JsonReader(new StringReader(CARS_JSON));
@@ -129,6 +138,7 @@ public final class MixedStreamTest extends TestCase {
     }
   }
 
+  @Test
   public void testWriteInvalidState() throws IOException {
     Gson gson = new Gson();
     JsonWriter jsonWriter = new JsonWriter(new StringWriter());
@@ -140,6 +150,7 @@ public final class MixedStreamTest extends TestCase {
     }
   }
 
+  @Test
   public void testWriteClosed() throws IOException {
     Gson gson = new Gson();
     JsonWriter jsonWriter = new JsonWriter(new StringWriter());
@@ -153,6 +164,7 @@ public final class MixedStreamTest extends TestCase {
     }
   }
 
+  @Test
   public void testWriteNulls() {
     Gson gson = new Gson();
     try {
@@ -166,6 +178,7 @@ public final class MixedStreamTest extends TestCase {
     assertEquals("null", stringWriter.toString());
   }
 
+  @Test
   public void testReadNulls() {
     Gson gson = new Gson();
     try {
@@ -180,6 +193,7 @@ public final class MixedStreamTest extends TestCase {
     }
   }
 
+  @Test
   public void testWriteHtmlSafe() {
     List<String> contents = Arrays.asList("<", ">", "&", "=", "'");
     Type type = new TypeToken<List<String>>() {}.getType();
@@ -196,6 +210,7 @@ public final class MixedStreamTest extends TestCase {
         writer.toString());
   }
 
+  @Test
   public void testWriteLenient() {
     List<Double> doubles = Arrays.asList(Double.NaN, Double.NEGATIVE_INFINITY,
         Double.POSITIVE_INFINITY, -0.0d, 0.5d, 0.0d);

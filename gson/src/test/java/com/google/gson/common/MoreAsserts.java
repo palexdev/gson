@@ -16,16 +16,10 @@
 
 package com.google.gson.common;
 
-import org.junit.Assert;
-
 import java.util.Collection;
 
-/**
- * Handy asserts that we wish were present in {@link Assert}
- * so that we didn't have to write them.
- *
- * @author Inderjeet Singh
- */
+import static org.junit.jupiter.api.Assertions.*;
+
 public class MoreAsserts {
 
   /**
@@ -39,14 +33,14 @@ public class MoreAsserts {
         return;
       }
     }
-    Assert.fail(value + " not present in " + collection);
+    fail(value + " not present in " + collection);
   }
 
   public static void assertEqualsAndHashCode(Object a, Object b) {
-    Assert.assertTrue(a.equals(b));
-    Assert.assertTrue(b.equals(a));
-    Assert.assertEquals(a.hashCode(), b.hashCode());
-    Assert.assertFalse(a.equals(null));
-    Assert.assertFalse(a.equals(new Object()));
+    assertEquals(a, b);
+    assertEquals(b, a);
+    assertEquals(a.hashCode(), b.hashCode());
+    assertNotEquals(null, a);
+    assertNotEquals(a, new Object());
   }
 }

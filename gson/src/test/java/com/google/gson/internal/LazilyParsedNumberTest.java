@@ -15,18 +15,23 @@
  */
 package com.google.gson.internal;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class LazilyParsedNumberTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class LazilyParsedNumberTest {
+
+  @Test
   public void testHashCode() {
     LazilyParsedNumber n1 = new LazilyParsedNumber("1");
     LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
     assertEquals(n1.hashCode(), n1Another.hashCode());
   }
 
+  @Test
   public void testEquals() {
     LazilyParsedNumber n1 = new LazilyParsedNumber("1");
     LazilyParsedNumber n1Another = new LazilyParsedNumber("1");
-    assertTrue(n1.equals(n1Another));
+    assertEquals(n1, n1Another);
   }
 }

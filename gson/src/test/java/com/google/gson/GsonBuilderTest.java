@@ -16,35 +16,41 @@
 
 package com.google.gson;
 
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
-import junit.framework.TestCase;
-
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link GsonBuilder}.
  *
  * @author Inderjeet Singh
  */
-public class GsonBuilderTest extends TestCase {
-  private static final TypeAdapter<Object> NULL_TYPE_ADAPTER = new TypeAdapter<Object>() {
-    @Override public void write(JsonWriter out, Object value) {
+public class GsonBuilderTest {
+  private static final TypeAdapter<Object> NULL_TYPE_ADAPTER = new TypeAdapter<>() {
+    @Override
+    public void write(JsonWriter out, Object value) {
       throw new AssertionError();
     }
-    @Override public Object read(JsonReader in) {
+
+    @Override
+    public Object read(JsonReader in) {
       throw new AssertionError();
     }
   };
 
+  @Test
   public void testCreatingMoreThanOnce() {
     GsonBuilder builder = new GsonBuilder();
     builder.create();
     builder.create();
   }
 
+  @Test
   public void testExcludeFieldsWithModifiers() {
     Gson gson = new GsonBuilder()
         .excludeFieldsWithModifiers(Modifier.VOLATILE, Modifier.PRIVATE)
@@ -52,6 +58,7 @@ public class GsonBuilderTest extends TestCase {
     assertEquals("{\"d\":\"d\"}", gson.toJson(new HasModifiers()));
   }
 
+  @Test
   public void testRegisterTypeAdapterForCoreType() {
     Type[] types = {
         byte.class,
@@ -68,12 +75,13 @@ public class GsonBuilderTest extends TestCase {
 
   @SuppressWarnings("unused")
   static class HasModifiers {
-    private String a = "a";
+    private final String a = "a";
     volatile String b = "b";
-    private volatile String c = "c";
+    private final String c = "c";
     String d = "d";
   }
 
+  @Test
   public void testTransientFieldExclusion() {
     Gson gson = new GsonBuilder()
         .excludeFieldsWithModifiers()

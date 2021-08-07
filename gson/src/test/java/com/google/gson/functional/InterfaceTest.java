@@ -17,8 +17,10 @@
 package com.google.gson.functional;
 
 import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests involving interfaces.
@@ -26,35 +28,36 @@ import junit.framework.TestCase;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class InterfaceTest extends TestCase {
+public class InterfaceTest {
   private static final String OBJ_JSON = "{\"someStringValue\":\"StringValue\"}";
 
   private Gson gson;
   private TestObject obj;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
     obj = new TestObject("StringValue");
   }
 
-  public void testSerializingObjectImplementingInterface() throws Exception {
+  @Test
+  public void testSerializingObjectImplementingInterface() {
     assertEquals(OBJ_JSON, gson.toJson(obj));
   }
-  
-  public void testSerializingInterfaceObjectField() throws Exception {
+
+  @Test
+  public void testSerializingInterfaceObjectField() {
     TestObjectWrapper objWrapper = new TestObjectWrapper(obj);
     assertEquals("{\"obj\":" + OBJ_JSON + "}", gson.toJson(objWrapper));
   }
 
-  private static interface TestObjectInterface {
+  private interface TestObjectInterface {
     // Holder
   }
   
   private static class TestObject implements TestObjectInterface {
     @SuppressWarnings("unused")
-    private String someStringValue;
+    private final String someStringValue;
     
     private TestObject(String value) {
       this.someStringValue = value;
@@ -63,7 +66,7 @@ public class InterfaceTest extends TestCase {
 
   private static class TestObjectWrapper {
     @SuppressWarnings("unused")
-    private TestObjectInterface obj;
+    private final TestObjectInterface obj;
     
     private TestObjectWrapper(TestObjectInterface obj) {
       this.obj = obj;

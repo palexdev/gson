@@ -19,24 +19,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.common.TestTypes.BagOfPrimitives;
-import com.google.gson.common.TestTypes.Base;
-import com.google.gson.common.TestTypes.ClassWithBaseArrayField;
-import com.google.gson.common.TestTypes.ClassWithBaseCollectionField;
-import com.google.gson.common.TestTypes.ClassWithBaseField;
-import com.google.gson.common.TestTypes.Nested;
-import com.google.gson.common.TestTypes.Sub;
+import com.google.gson.common.TestTypes.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import java.util.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional tests for Json serialization and deserialization of classes with 
@@ -45,22 +34,23 @@ import java.util.TreeSet;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class InheritanceTest extends TestCase {
+public class InheritanceTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
-  public void testSubClassSerialization() throws Exception {
+  @Test
+  public void testSubClassSerialization() {
     SubTypeOfNested target = new SubTypeOfNested(new BagOfPrimitives(10, 20, false, "stringValue"),
         new BagOfPrimitives(30, 40, true, "stringValue"));
     assertEquals(target.getExpectedJson(), gson.toJson(target));
   }
 
-  public void testSubClassDeserialization() throws Exception {
+  @Test
+  public void testSubClassDeserialization() {
     String json = "{\"value\":5,\"primitive1\":{\"longValue\":10,\"intValue\":20,"
         + "\"booleanValue\":false,\"stringValue\":\"stringValue\"},\"primitive2\":"
         + "{\"longValue\":30,\"intValue\":40,\"booleanValue\":true,"
@@ -69,6 +59,7 @@ public class InheritanceTest extends TestCase {
     assertEquals(json, target.getExpectedJson());
   }
 
+  @Test
   public void testClassWithBaseFieldSerialization() {
     ClassWithBaseField sub = new ClassWithBaseField(new Sub());
     JsonObject json = (JsonObject) gson.toJsonTree(sub);
@@ -76,6 +67,7 @@ public class InheritanceTest extends TestCase {
     assertEquals(Sub.SUB_NAME, base.getAsJsonObject().get(Sub.SUB_FIELD_KEY).getAsString());
   }
 
+  @Test
   public void testClassWithBaseArrayFieldSerialization() {
     Base[] baseClasses = new Base[]{ new Sub(), new Sub()};
     ClassWithBaseArrayField sub = new ClassWithBaseArrayField(baseClasses);
@@ -86,8 +78,9 @@ public class InheritanceTest extends TestCase {
     }
   }
 
+  @Test
   public void testClassWithBaseCollectionFieldSerialization() {
-    Collection<Base> baseClasses = new ArrayList<Base>();
+    Collection<Base> baseClasses = new ArrayList<>();
     baseClasses.add(new Sub());
     baseClasses.add(new Sub());
     ClassWithBaseCollectionField sub = new ClassWithBaseCollectionField(baseClasses);
@@ -98,18 +91,21 @@ public class InheritanceTest extends TestCase {
     }
   }
 
+  @Test
   public void testBaseSerializedAsSub() {
     Base base = new Sub();
     JsonObject json = gson.toJsonTree(base).getAsJsonObject();
     assertEquals(Sub.SUB_NAME, json.get(Sub.SUB_FIELD_KEY).getAsString());
   }
 
+  @Test
   public void testBaseSerializedAsSubForToJsonMethod() {
     Base base = new Sub();
     String json = gson.toJson(base);
     assertTrue(json.contains(Sub.SUB_NAME));
   }
 
+  @Test
   public void testBaseSerializedAsBaseWhenSpecifiedWithExplicitType() {
     Base base = new Sub();
     JsonObject json = gson.toJsonTree(base, Base.class).getAsJsonObject();
@@ -117,6 +113,7 @@ public class InheritanceTest extends TestCase {
     assertNull(json.get(Sub.SUB_FIELD_KEY));
   }
 
+  @Test
   public void testBaseSerializedAsBaseWhenSpecifiedWithExplicitTypeForToJsonMethod() {
     Base base = new Sub();
     String json = gson.toJson(base, Base.class);
@@ -124,12 +121,14 @@ public class InheritanceTest extends TestCase {
     assertFalse(json.contains(Sub.SUB_FIELD_KEY));
   }
 
+  @Test
   public void testBaseSerializedAsSubWhenSpecifiedWithExplicitType() {
     Base base = new Sub();
     JsonObject json = gson.toJsonTree(base, Sub.class).getAsJsonObject();
     assertEquals(Sub.SUB_NAME, json.get(Sub.SUB_FIELD_KEY).getAsString());
   }
 
+  @Test
   public void testBaseSerializedAsSubWhenSpecifiedWithExplicitTypeForToJsonMethod() {
     Base base = new Sub();
     String json = gson.toJson(base, Sub.class);
@@ -150,23 +149,24 @@ public class InheritanceTest extends TestCase {
     }
   }
 
-  public void testSubInterfacesOfCollectionSerialization() throws Exception {
-    List<Integer> list = new LinkedList<Integer>();
+  @Test
+  public void testSubInterfacesOfCollectionSerialization() {
+    List<Integer> list = new LinkedList<>();
     list.add(0);
     list.add(1);
     list.add(2);
     list.add(3);
-    Queue<Long> queue = new LinkedList<Long>();
+    Queue<Long> queue = new LinkedList<>();
     queue.add(0L);
     queue.add(1L);
     queue.add(2L);
     queue.add(3L);
-    Set<Float> set = new TreeSet<Float>();
+    Set<Float> set = new TreeSet<>();
     set.add(0.1F);
     set.add(0.2F);
     set.add(0.3F);
     set.add(0.4F);
-    SortedSet<Character> sortedSet = new TreeSet<Character>();
+    SortedSet<Character> sortedSet = new TreeSet<>();
     sortedSet.add('a');
     sortedSet.add('b');
     sortedSet.add('c');
@@ -176,7 +176,8 @@ public class InheritanceTest extends TestCase {
     assertEquals(target.getExpectedJson(), gson.toJson(target));
   }
 
-  public void testSubInterfacesOfCollectionDeserialization() throws Exception {
+  @Test
+  public void testSubInterfacesOfCollectionDeserialization() {
     String json = "{\"list\":[0,1,2,3],\"queue\":[0,1,2,3],\"set\":[0.1,0.2,0.3,0.4],"
         + "\"sortedSet\":[\"a\",\"b\",\"c\",\"d\"]"
         + "}";
@@ -189,10 +190,10 @@ public class InheritanceTest extends TestCase {
   }
   
   private static class ClassWithSubInterfacesOfCollection {
-    private List<Integer> list;
-    private Queue<Long> queue;
-    private Set<Float> set;
-    private SortedSet<Character> sortedSet;
+    private final List<Integer> list;
+    private final Queue<Long> queue;
+    private final Set<Float> set;
+    private final SortedSet<Character> sortedSet;
 
     public ClassWithSubInterfacesOfCollection(List<Integer> list, Queue<Long> queue, Set<Float> set,
         SortedSet<Character> sortedSet) {

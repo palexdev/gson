@@ -19,17 +19,23 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonToken;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("resource")
-public class JsonTreeReaderTest extends TestCase {
+public class JsonTreeReaderTest {
+
+  @Test
   public void testSkipValue_emptyJsonObject() throws IOException {
     JsonTreeReader in = new JsonTreeReader(new JsonObject());
     in.skipValue();
     assertEquals(JsonToken.END_DOCUMENT, in.peek());
   }
 
+  @Test
   public void testSkipValue_filledJsonObject() throws IOException {
     JsonObject jsonObject = new JsonObject();
     JsonArray jsonArray = new JsonArray();

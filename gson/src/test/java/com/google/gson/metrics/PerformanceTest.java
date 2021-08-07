@@ -20,8 +20,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.Expose;
 import com.google.gson.reflect.TypeToken;
-
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.StringWriter;
 import java.lang.reflect.Type;
@@ -30,6 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * Tests to measure performance for Gson. All tests in this file will be disabled in code. To run
  * them remove disabled_ prefix from the tests and run them.
@@ -37,23 +40,24 @@ import java.util.Map;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class PerformanceTest extends TestCase {
+public class PerformanceTest {
   private static final int COLLECTION_SIZE = 5000;
 
   private static final int NUM_ITERATIONS = 100;
 
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
-  
+
+  @Test
   public void testDummy() {
     // This is here to prevent Junit for complaining when we disable all tests.
   }
 
+  @Test
   public void disabled_testStringDeserialization() {
     StringBuilder sb = new StringBuilder(8096);
     sb.append("Error Yippie");
@@ -70,7 +74,7 @@ public class PerformanceTest extends TestCase {
       }
     }
   }
-  
+
   private void parseLongJson(String json) throws JsonParseException {
     ExceptionHolder target = gson.fromJson(json, ExceptionHolder.class);
     assertTrue(target.message.contains("Error"));
@@ -111,9 +115,10 @@ public class PerformanceTest extends TestCase {
   /**
    * Created in response to http://code.google.com/p/google-gson/issues/detail?id=96
    */
+  @Test
   public void disabled_testLargeCollectionSerialization() {
     int count = 1400000;
-    List<CollectionEntry> list = new ArrayList<CollectionEntry>(count);
+    List<CollectionEntry> list = new ArrayList<>(count);
     for (int i = 0; i < count; ++i) {
       list.add(new CollectionEntry("name"+i,"value"+i));
     }    
@@ -123,6 +128,7 @@ public class PerformanceTest extends TestCase {
   /**
    * Created in response to http://code.google.com/p/google-gson/issues/detail?id=96
    */
+  @Test
   public void disabled_testLargeCollectionDeserialization() {
     StringBuilder sb = new StringBuilder();
     int count = 87000;
@@ -147,6 +153,7 @@ public class PerformanceTest extends TestCase {
    * Created in response to http://code.google.com/p/google-gson/issues/detail?id=96
    */
   // Last I tested, Gson was able to serialize upto 14MB byte array
+  @Test
   public void disabled_testByteArraySerialization() {
     for (int size = 4145152; true; size += 1036288) {
       byte[] ba = new byte[size];
@@ -162,6 +169,7 @@ public class PerformanceTest extends TestCase {
    * Created in response to http://code.google.com/p/google-gson/issues/detail?id=96
    */
   // Last I tested, Gson was able to deserialize a byte array of 11MB
+  @Test
   public void disable_testByteArrayDeserialization() {
     for (int numElements = 10639296; true; numElements += 16384) {
       StringBuilder sb = new StringBuilder(numElements*2);
@@ -190,7 +198,7 @@ public class PerformanceTest extends TestCase {
 // Deserialized classes avg time: 70 ms
 // Serialize exposed classes avg time: 159 ms
 // Deserialized exposed classes avg time: 173 ms
-  
+  @Test
   public void disabled_testSerializeClasses() {
     ClassWithList c = new ClassWithList("str"); 
     for (int i = 0; i < COLLECTION_SIZE; ++i) { 
@@ -206,6 +214,7 @@ public class PerformanceTest extends TestCase {
     System.out.printf("Serialize classes avg time: %d ms\n", avg);
   }
 
+  @Test
   public void disabled_testDeserializeClasses() {
     String json = buildJsonForClassWithList();
     ClassWithList[] target = new ClassWithList[NUM_ITERATIONS];
@@ -217,9 +226,10 @@ public class PerformanceTest extends TestCase {
     long avg = (t2 - t1) / NUM_ITERATIONS;
     System.out.printf("Deserialize classes avg time: %d ms\n", avg);
   }
-  
+
+  @Test
   public void disable_testLargeObjectSerializationAndDeserialization() {
-    Map<String, Long> largeObject = new HashMap<String, Long>();
+    Map<String, Long> largeObject = new HashMap<>();
     for (long l = 0; l < 100000; l++) {
       largeObject.put("field" + l, l);
     }
@@ -236,6 +246,7 @@ public class PerformanceTest extends TestCase {
     
   }
 
+  @Test
   public void disabled_testSerializeExposedClasses() {
     ClassWithListOfObjects c1 = new ClassWithListOfObjects("str"); 
     for (int i1 = 0; i1 < COLLECTION_SIZE; ++i1) { 
@@ -252,6 +263,7 @@ public class PerformanceTest extends TestCase {
     System.out.printf("Serialize exposed classes avg time: %d ms\n", avg);
   }
 
+  @Test
   public void disabled_testDeserializeExposedClasses() {
     String json = buildJsonForClassWithList();
     ClassWithListOfObjects[] target = new ClassWithListOfObjects[NUM_ITERATIONS];
@@ -264,8 +276,9 @@ public class PerformanceTest extends TestCase {
     System.out.printf("Deserialize exposed classes avg time: %d ms\n", avg);
   }
 
-  public void disabled_testLargeGsonMapRoundTrip() throws Exception {
-    Map<Long, Long> original = new HashMap<Long, Long>();
+  @Test
+  public void disabled_testLargeGsonMapRoundTrip() {
+    Map<Long, Long> original = new HashMap<>();
     for (long i = 0; i < 1000000; i++) {
       original.put(i, i + 1);
     }
@@ -287,18 +300,17 @@ public class PerformanceTest extends TestCase {
       } else {
         sb.append(",");
       }
-      sb.append("{field:'element-" + i + "'}");
+      sb.append("{field:'element-").append(i).append("'}");
     }
     sb.append("]");
     sb.append("}");
-    String json = sb.toString();
-    return json;
+    return sb.toString();
   }
 
   @SuppressWarnings("unused")
   private static final class ClassWithList { 
     final String field; 
-    final List<ClassWithField> list = new ArrayList<ClassWithField>(COLLECTION_SIZE);
+    final List<ClassWithField> list = new ArrayList<>(COLLECTION_SIZE);
     ClassWithList() {
       this(null);
     }
@@ -323,7 +335,7 @@ public class PerformanceTest extends TestCase {
     @Expose 
     final String field; 
     @Expose 
-    final List<ClassWithExposedField> list = new ArrayList<ClassWithExposedField>(COLLECTION_SIZE);
+    final List<ClassWithExposedField> list = new ArrayList<>(COLLECTION_SIZE);
     ClassWithListOfObjects() {
       this(null);
     }

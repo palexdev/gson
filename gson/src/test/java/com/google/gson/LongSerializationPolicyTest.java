@@ -16,7 +16,9 @@
 
 package com.google.gson;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit test for the {@link LongSerializationPolicy} class.
@@ -24,9 +26,10 @@ import junit.framework.TestCase;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class LongSerializationPolicyTest extends TestCase {
+public class LongSerializationPolicyTest {
 
-  public void testDefaultLongSerialization() throws Exception {
+  @Test
+  public void testDefaultLongSerialization() {
     JsonElement element = LongSerializationPolicy.DEFAULT.serialize(1556L);
     assertTrue(element.isJsonPrimitive());
     
@@ -35,7 +38,8 @@ public class LongSerializationPolicyTest extends TestCase {
     assertTrue(jsonPrimitive.isNumber());
     assertEquals(1556L, element.getAsLong());
   }
-  
+
+  @Test
   public void testDefaultLongSerializationIntegration() {
     Gson gson = new GsonBuilder()
         .setLongSerializationPolicy(LongSerializationPolicy.DEFAULT)
@@ -44,7 +48,8 @@ public class LongSerializationPolicyTest extends TestCase {
     assertEquals("[1]", gson.toJson(new Long[] { 1L }, Long[].class));
   }
 
-  public void testStringLongSerialization() throws Exception {
+  @Test
+  public void testStringLongSerialization() {
     JsonElement element = LongSerializationPolicy.STRING.serialize(1556L);
     assertTrue(element.isJsonPrimitive());
 
@@ -54,6 +59,7 @@ public class LongSerializationPolicyTest extends TestCase {
     assertEquals("1556", element.getAsString());
   }
 
+  @Test
   public void testStringLongSerializationIntegration() {
     Gson gson = new GsonBuilder()
         .setLongSerializationPolicy(LongSerializationPolicy.STRING)

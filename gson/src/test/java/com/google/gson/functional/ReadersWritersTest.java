@@ -20,18 +20,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonStreamParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.common.TestTypes.BagOfPrimitives;
-
 import com.google.gson.reflect.TypeToken;
-import java.util.Map;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.io.CharArrayReader;
-import java.io.CharArrayWriter;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.*;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional tests for the support of {@link Reader}s and {@link Writer}s.
@@ -39,41 +35,45 @@ import java.io.Writer;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class ReadersWritersTest extends TestCase {
+public class ReadersWritersTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
-  public void testWriterForSerialization() throws Exception {
+  @Test
+  public void testWriterForSerialization() {
     Writer writer = new StringWriter();
     BagOfPrimitives src = new BagOfPrimitives();
     gson.toJson(src, writer);
     assertEquals(src.getExpectedJson(), writer.toString());
   }
 
-  public void testReaderForDeserialization() throws Exception {
+  @Test
+  public void testReaderForDeserialization() {
     BagOfPrimitives expected = new BagOfPrimitives();
     Reader json = new StringReader(expected.getExpectedJson());
     BagOfPrimitives actual = gson.fromJson(json, BagOfPrimitives.class);
     assertEquals(expected, actual);
   }
 
+  @Test
   public void testTopLevelNullObjectSerializationWithWriter() {
     StringWriter writer = new StringWriter();
     gson.toJson(null, writer);
     assertEquals("null", writer.toString());
   }
 
+  @Test
   public void testTopLevelNullObjectDeserializationWithReader() {
     StringReader reader = new StringReader("null");
     Integer nullIntObject = gson.fromJson(reader, Integer.class);
     assertNull(nullIntObject);
   }
 
+  @Test
   public void testTopLevelNullObjectSerializationWithWriterAndSerializeNulls() {
     Gson gson = new GsonBuilder().serializeNulls().create();
     StringWriter writer = new StringWriter();
@@ -81,6 +81,7 @@ public class ReadersWritersTest extends TestCase {
     assertEquals("null", writer.toString());
   }
 
+  @Test
   public void testTopLevelNullObjectDeserializationWithReaderAndSerializeNulls() {
     Gson gson = new GsonBuilder().serializeNulls().create();
     StringReader reader = new StringReader("null");
@@ -88,6 +89,7 @@ public class ReadersWritersTest extends TestCase {
     assertNull(nullIntObject);
   }
 
+  @Test
   public void testReadWriteTwoStrings() throws IOException {
     Gson gson= new Gson();
     CharArrayWriter writer= new CharArrayWriter();
@@ -101,6 +103,7 @@ public class ReadersWritersTest extends TestCase {
     assertEquals("two", actualTwo);
   }
 
+  @Test
   public void testReadWriteTwoObjects() throws IOException {
     Gson gson= new Gson();
     CharArrayWriter writer= new CharArrayWriter();
@@ -117,6 +120,7 @@ public class ReadersWritersTest extends TestCase {
     assertFalse(parser.hasNext());
   }
 
+  @Test
   public void testTypeMismatchThrowsJsonSyntaxExceptionForStrings() {
     try {
       gson.fromJson("true", new TypeToken<Map<String, String>>() {}.getType());
@@ -125,6 +129,7 @@ public class ReadersWritersTest extends TestCase {
     }
   }
 
+  @Test
   public void testTypeMismatchThrowsJsonSyntaxExceptionForReaders() {
     try {
       gson.fromJson(new StringReader("true"), new TypeToken<Map<String, String>>() {}.getType());

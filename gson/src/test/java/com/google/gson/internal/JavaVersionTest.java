@@ -15,11 +15,9 @@
  */
 package com.google.gson.internal;
 
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-import com.google.gson.internal.JavaVersion;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit and functional tests for {@link JavaVersion}
@@ -27,7 +25,7 @@ import com.google.gson.internal.JavaVersion;
  * @author Inderjeet Singh
  */
 public class JavaVersionTest {
-  // Borrowed some of test strings from https://github.com/prestodb/presto/blob/master/presto-main/src/test/java/com/facebook/presto/server/TestJavaVersion.java
+  // Borrowed some test strings from https://github.com/prestodb/presto/blob/master/presto-main/src/test/java/com/facebook/presto/server/TestJavaVersion.java
 
   @Test
   public void testGetMajorJavaVersion() {

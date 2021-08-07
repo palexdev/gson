@@ -16,26 +16,22 @@
 
 package com.google.gson.functional;
 
+import com.google.gson.*;
+import com.google.gson.annotations.JsonAdapter;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Type;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.annotations.JsonAdapter;
-
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Functional tests for the {@link JsonAdapter} annotation on fields where the value is of
  * type {@link JsonSerializer} or {@link JsonDeserializer}.
  */
-public final class JsonAdapterSerializerDeserializerTest extends TestCase {
+public final class JsonAdapterSerializerDeserializerTest {
 
+  @Test
   public void testJsonSerializerDeserializerBasedJsonAdapterOnFields() {
     Gson gson = new Gson();
     String json = gson.toJson(new Computer(new User("Inderjeet Singh"), null, new User("Jesse Wilson")));
@@ -90,6 +86,7 @@ public final class JsonAdapterSerializerDeserializerTest extends TestCase {
     }
   }
 
+  @Test
   public void testJsonSerializerDeserializerBasedJsonAdapterOnClass() {
     Gson gson = new Gson();
     String json = gson.toJson(new Computer2(new User2("Inderjeet Singh")));
@@ -125,6 +122,7 @@ public final class JsonAdapterSerializerDeserializerTest extends TestCase {
     }
   }
 
+  @Test
   public void testDifferentJsonAdaptersForGenericFieldsOfSameRawType() {
     Container c = new Container("Foo", 10);
     Gson gson = new Gson();
@@ -137,8 +135,8 @@ public final class JsonAdapterSerializerDeserializerTest extends TestCase {
     @JsonAdapter(BaseStringAdapter.class) Base<String> a;
     @JsonAdapter(BaseIntegerAdapter.class) Base<Integer> b;
     Container(String a, int b) {
-      this.a = new Base<String>(a);
-      this.b = new Base<Integer>(b);
+      this.a = new Base<>(a);
+      this.b = new Base<>(b);
     }
   }
 

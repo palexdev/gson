@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id "com.github.gmazzo.buildconfig" version "3.0.2"
     id 'com.vanniktech.maven.publish' version '0.13.0'
 }
 
@@ -15,3 +16,38 @@ dependencies {
 }
 
 sourceSets.main.java.exclude("**/module-info.java")
+
+buildConfig {
+    useJavaOutput()
+    className("GsonBuildConfig")
+    packageName("com.google.gson.internal")
+
+    buildConfigField("String", "VERSION", "\"${project.version}\"")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
+task sourcesJarBuild(type: Jar, dependsOn: classes) {
+    archiveClassifier.set('sources')
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJarBuild
+    archives jar
+}
+
+jar {
+    manifest {
+        attributes(
+                'Bundle-Name': project.name,
+                'Bundle-Description': "Gson is a Java library that can be used to convert Java Objects into their JSON representation (now with fixed Long serialization and deserialization).",
+                'Bundle-SymbolicName': 'io.github.palexdev'
+        )
+    }
+}
+

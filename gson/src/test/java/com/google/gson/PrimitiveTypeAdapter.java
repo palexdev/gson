@@ -44,13 +44,7 @@ final class PrimitiveTypeAdapter {
       try {
         Constructor<?> constructor = aClass.getConstructor(String.class);
         return (T) constructor.newInstance(from.toString());
-      } catch (NoSuchMethodException e) {
-        throw new JsonParseException(e);
-      } catch (IllegalAccessException e) {
-        throw new JsonParseException(e);
-      } catch (InvocationTargetException e) {
-        throw new JsonParseException(e);
-      } catch (InstantiationException e) {
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
         throw new JsonParseException(e);
       }
     } else if (Enum.class.isAssignableFrom(to)) {
@@ -59,11 +53,7 @@ final class PrimitiveTypeAdapter {
       try {
         Method valuesMethod = to.getMethod("valueOf", String.class);
         return (T) valuesMethod.invoke(null, from.toString());
-      } catch (NoSuchMethodException e) {
-        throw new RuntimeException(e);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
         throw new RuntimeException(e);
       }
     } else {

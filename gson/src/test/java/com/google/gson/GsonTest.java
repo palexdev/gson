@@ -19,50 +19,49 @@ package com.google.gson;
 import com.google.gson.internal.Excluder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import junit.framework.TestCase;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link Gson}.
  *
  * @author Ryan Harter
  */
-public final class GsonTest extends TestCase {
+public final class GsonTest {
 
   private static final Excluder CUSTOM_EXCLUDER = Excluder.DEFAULT
       .excludeFieldsWithoutExposeAnnotation()
       .disableInnerClassSerialization();
 
-  private static final FieldNamingStrategy CUSTOM_FIELD_NAMING_STRATEGY = new FieldNamingStrategy() {
-    @Override public String translateName(Field f) {
-      return "foo";
-    }
-  };
+  private static final FieldNamingStrategy CUSTOM_FIELD_NAMING_STRATEGY = f -> "foo";
 
+  @Test
   public void testOverridesDefaultExcluder() {
     Gson gson = new Gson(CUSTOM_EXCLUDER, CUSTOM_FIELD_NAMING_STRATEGY,
-        new HashMap<Type, InstanceCreator<?>>(), true, false, true, false,
+            new HashMap<>(), true, false, true, false,
         true, true, false, LongSerializationPolicy.DEFAULT, null, DateFormat.DEFAULT,
-        DateFormat.DEFAULT, new ArrayList<TypeAdapterFactory>(),
-        new ArrayList<TypeAdapterFactory>(), new ArrayList<TypeAdapterFactory>());
+        DateFormat.DEFAULT, new ArrayList<>(),
+            new ArrayList<>(), new ArrayList<>());
 
     assertEquals(CUSTOM_EXCLUDER, gson.excluder());
     assertEquals(CUSTOM_FIELD_NAMING_STRATEGY, gson.fieldNamingStrategy());
-    assertEquals(true, gson.serializeNulls());
-    assertEquals(false, gson.htmlSafe());
+    assertTrue(gson.serializeNulls());
+    assertFalse(gson.htmlSafe());
   }
 
+  @Test
   public void testClonedTypeAdapterFactoryListsAreIndependent() {
     Gson original = new Gson(CUSTOM_EXCLUDER, CUSTOM_FIELD_NAMING_STRATEGY,
-        new HashMap<Type, InstanceCreator<?>>(), true, false, true, false,
+            new HashMap<>(), true, false, true, false,
         true, true, false, LongSerializationPolicy.DEFAULT, null, DateFormat.DEFAULT,
-        DateFormat.DEFAULT, new ArrayList<TypeAdapterFactory>(),
-        new ArrayList<TypeAdapterFactory>(), new ArrayList<TypeAdapterFactory>());
+        DateFormat.DEFAULT, new ArrayList<>(),
+            new ArrayList<>(), new ArrayList<>());
 
     Gson clone = original.newBuilder()
         .registerTypeAdapter(Object.class, new TestTypeAdapter())

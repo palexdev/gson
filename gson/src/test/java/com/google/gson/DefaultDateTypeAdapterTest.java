@@ -16,6 +16,9 @@
 
 package com.google.gson;
 
+import com.google.gson.internal.JavaVersion;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,21 +26,21 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import com.google.gson.internal.JavaVersion;
-
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * A simple unit test for the {@link DefaultDateTypeAdapter} class.
  *
  * @author Joel Leitch
  */
-public class DefaultDateTypeAdapterTest extends TestCase {
+public class DefaultDateTypeAdapterTest {
 
+  @Test
   public void testFormattingInEnUs() {
     assertFormattingAlwaysEmitsUsLocale(Locale.US);
   }
 
+  @Test
   public void testFormattingInFr() {
     assertFormattingAlwaysEmitsUsLocale(Locale.FRANCE);
   }
@@ -70,6 +73,7 @@ public class DefaultDateTypeAdapterTest extends TestCase {
     }
   }
 
+  @Test
   public void testParsingDatesFormattedWithSystemLocale() throws Exception {
     TimeZone defaultTimeZone = TimeZone.getDefault();
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -99,6 +103,7 @@ public class DefaultDateTypeAdapterTest extends TestCase {
     }
   }
 
+  @Test
   public void testParsingDatesFormattedWithUsLocale() throws Exception {
     TimeZone defaultTimeZone = TimeZone.getDefault();
     TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -123,6 +128,7 @@ public class DefaultDateTypeAdapterTest extends TestCase {
     }
   }
 
+  @Test
   public void testFormatUsesDefaultTimezone() throws Exception {
     TimeZone defaultTimeZone = TimeZone.getDefault();
     TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -139,6 +145,7 @@ public class DefaultDateTypeAdapterTest extends TestCase {
     }
   }
 
+  @Test
   public void testDateDeserializationISO8601() throws Exception {
     DefaultDateTypeAdapter adapter = new DefaultDateTypeAdapter(Date.class);
     assertParsed("1970-01-01T00:00:00.000Z", adapter);
@@ -147,8 +154,9 @@ public class DefaultDateTypeAdapterTest extends TestCase {
     assertParsed("1970-01-01T01:00:00+01:00", adapter);
     assertParsed("1970-01-01T01:00:00+01", adapter);
   }
-  
-  public void testDateSerialization() throws Exception {
+
+  @Test
+  public void testDateSerialization() {
     int dateStyle = DateFormat.LONG;
     DefaultDateTypeAdapter dateTypeAdapter = new DefaultDateTypeAdapter(Date.class, dateStyle);
     DateFormat formatter = DateFormat.getDateInstance(dateStyle, Locale.US);
@@ -158,7 +166,8 @@ public class DefaultDateTypeAdapterTest extends TestCase {
     assertEquals(toLiteral(formatter.format(currentDate)), dateString);
   }
 
-  public void testDatePattern() throws Exception {
+  @Test
+  public void testDatePattern() {
     String pattern = "yyyy-MM-dd";
     DefaultDateTypeAdapter dateTypeAdapter = new DefaultDateTypeAdapter(Date.class, pattern);
     DateFormat formatter = new SimpleDateFormat(pattern);
@@ -169,19 +178,22 @@ public class DefaultDateTypeAdapterTest extends TestCase {
   }
 
   @SuppressWarnings("unused")
-  public void testInvalidDatePattern() throws Exception {
+  @Test
+  public void testInvalidDatePattern() {
     try {
       new DefaultDateTypeAdapter(Date.class, "I am a bad Date pattern....");
       fail("Invalid date pattern should fail.");
     } catch (IllegalArgumentException expected) { }
   }
 
+  @Test
   public void testNullValue() throws Exception {
     DefaultDateTypeAdapter adapter = new DefaultDateTypeAdapter(Date.class);
     assertNull(adapter.fromJson("null"));
     assertEquals("null", adapter.toJson(null));
   }
 
+  @Test
   public void testUnexpectedToken() throws Exception {
     try {
       DefaultDateTypeAdapter adapter = new DefaultDateTypeAdapter(Date.class);
@@ -195,8 +207,8 @@ public class DefaultDateTypeAdapterTest extends TestCase {
   }
 
   private void assertParsed(String date, DefaultDateTypeAdapter adapter) throws IOException {
-    assertEquals(date, new Date(0), adapter.fromJson(toLiteral(date)));
-    assertEquals("ISO 8601", new Date(0), adapter.fromJson(toLiteral("1970-01-01T00:00:00Z")));
+    assertEquals(date, adapter.fromJson(toLiteral(date)).toString());
+    assertEquals("ISO 8601", adapter.fromJson(toLiteral("1970-01-01T00:00:00Z")).toString());
   }
 
   private static String toLiteral(String s) {

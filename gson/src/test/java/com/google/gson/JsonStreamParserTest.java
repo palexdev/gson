@@ -15,24 +15,27 @@
  */
 package com.google.gson;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.NoSuchElementException;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Unit tests for {@link JsonStreamParser}
  * 
  * @author Inderjeet Singh
  */
-public class JsonStreamParserTest extends TestCase {
+public class JsonStreamParserTest {
   private JsonStreamParser parser;
   
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     parser = new JsonStreamParser("'one' 'two'");
   }
 
+  @Test
   public void testParseTwoStrings() {
     String actualOne = parser.next().getAsString();
     assertEquals("one", actualOne);
@@ -40,6 +43,7 @@ public class JsonStreamParserTest extends TestCase {
     assertEquals("two", actualTwo);
   }
 
+  @Test
   public void testIterator() {
     assertTrue(parser.hasNext());
     assertEquals("one", parser.next().getAsString());
@@ -48,7 +52,8 @@ public class JsonStreamParserTest extends TestCase {
     assertFalse(parser.hasNext());
   }
 
-  public void testNoSideEffectForHasNext() throws Exception {
+  @Test
+  public void testNoSideEffectForHasNext() {
     assertTrue(parser.hasNext());
     assertTrue(parser.hasNext());
     assertTrue(parser.hasNext());
@@ -62,6 +67,7 @@ public class JsonStreamParserTest extends TestCase {
     assertFalse(parser.hasNext());
   }
 
+  @Test
   public void testCallingNextBeyondAvailableInput() {
     parser.next();
     parser.next();

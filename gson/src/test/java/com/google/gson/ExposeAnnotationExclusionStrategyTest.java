@@ -17,49 +17,57 @@
 package com.google.gson;
 
 import com.google.gson.annotations.Expose;
-
 import com.google.gson.internal.Excluder;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for GsonBuilder.REQUIRE_EXPOSE_DESERIALIZE.
  *
  * @author Joel Leitch
  */
-public class ExposeAnnotationExclusionStrategyTest extends TestCase {
-  private Excluder excluder = Excluder.DEFAULT.excludeFieldsWithoutExposeAnnotation();
+public class ExposeAnnotationExclusionStrategyTest {
+  private final Excluder excluder = Excluder.DEFAULT.excludeFieldsWithoutExposeAnnotation();
 
-  public void testNeverSkipClasses() throws Exception {
+  @Test
+  public void testNeverSkipClasses() {
     assertFalse(excluder.excludeClass(MockObject.class, true));
     assertFalse(excluder.excludeClass(MockObject.class, false));
   }
 
+  @Test
   public void testSkipNonAnnotatedFields() throws Exception {
     Field f = createFieldAttributes("hiddenField");
     assertTrue(excluder.excludeField(f, true));
     assertTrue(excluder.excludeField(f, false));
   }
 
+  @Test
   public void testSkipExplicitlySkippedFields() throws Exception {
     Field f = createFieldAttributes("explicitlyHiddenField");
     assertTrue(excluder.excludeField(f, true));
     assertTrue(excluder.excludeField(f, false));
   }
 
+  @Test
   public void testNeverSkipExposedAnnotatedFields() throws Exception {
     Field f = createFieldAttributes("exposedField");
     assertFalse(excluder.excludeField(f, true));
     assertFalse(excluder.excludeField(f, false));
   }
 
+  @Test
   public void testNeverSkipExplicitlyExposedAnnotatedFields() throws Exception {
     Field f = createFieldAttributes("explicitlyExposedField");
     assertFalse(excluder.excludeField(f, true));
     assertFalse(excluder.excludeField(f, false));
   }
 
+  @Test
   public void testDifferentSerializeAndDeserializeField() throws Exception {
     Field f = createFieldAttributes("explicitlyDifferentModeField");
     assertFalse(excluder.excludeField(f, true));
@@ -75,13 +83,13 @@ public class ExposeAnnotationExclusionStrategyTest extends TestCase {
     @Expose
     public final int exposedField = 0;
 
-    @Expose(serialize=true, deserialize=true)
+    @Expose()
     public final int explicitlyExposedField = 0;
 
     @Expose(serialize=false, deserialize=false)
     public final int explicitlyHiddenField = 0;
 
-    @Expose(serialize=true, deserialize=false)
+    @Expose(deserialize=false)
     public final int explicitlyDifferentModeField = 0;
 
     public final int hiddenField = 0;

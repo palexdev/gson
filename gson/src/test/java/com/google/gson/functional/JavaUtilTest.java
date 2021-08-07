@@ -16,26 +16,28 @@
 
 package com.google.gson.functional;
 
+import com.google.gson.Gson;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Currency;
 import java.util.Properties;
 
-import com.google.gson.Gson;
-
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional test for Json serialization and deserialization for classes in java.util
  */
-public class JavaUtilTest extends TestCase {
+public class JavaUtilTest {
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
-  public void testCurrency() throws Exception {
+  @Test
+  public void testCurrency() {
     CurrencyHolder target = gson.fromJson("{'value':'USD'}", CurrencyHolder.class);
     assertEquals("USD", target.value.getCurrencyCode());
     String json = gson.toJson(target);
@@ -51,6 +53,7 @@ public class JavaUtilTest extends TestCase {
     Currency value;
   }
 
+  @Test
   public void testProperties() {
     Properties props = gson.fromJson("{'a':'v1','b':'v2'}", Properties.class);
     assertEquals("v1", props.getProperty("a"));

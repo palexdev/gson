@@ -20,8 +20,10 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Since;
 import com.google.gson.annotations.Until;
 import com.google.gson.common.TestTypes.BagOfPrimitives;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Functional tests for versioning support in Gson.
@@ -29,7 +31,7 @@ import junit.framework.TestCase;
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class VersioningTest extends TestCase {
+public class VersioningTest {
   private static final int A = 0;
   private static final int B = 1;
   private static final int C = 2;
@@ -37,12 +39,12 @@ public class VersioningTest extends TestCase {
 
   private GsonBuilder builder;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     builder = new GsonBuilder();
   }
 
+  @Test
   public void testVersionedUntilSerialization() {
     Version1 target = new Version1();
     Gson gson = builder.setVersion(1.29).create();
@@ -54,6 +56,7 @@ public class VersioningTest extends TestCase {
     assertFalse(json.contains("\"a\":" + A));
   }
 
+  @Test
   public void testVersionedUntilDeserialization() {
     Gson gson = builder.setVersion(1.3).create();
     String json = "{\"a\":3,\"b\":4,\"c\":5}";
@@ -61,6 +64,7 @@ public class VersioningTest extends TestCase {
     assertEquals(A, version1.a);
   }
 
+  @Test
   public void testVersionedClassesSerialization() {
     Gson gson = builder.setVersion(1.0).create();
     String json1 = gson.toJson(new Version1());
@@ -68,6 +72,7 @@ public class VersioningTest extends TestCase {
     assertEquals(json1, json2);
   }
 
+  @Test
   public void testVersionedClassesDeserialization() {
     Gson gson = builder.setVersion(1.0).create();
     String json = "{\"a\":3,\"b\":4,\"c\":5}";
@@ -80,11 +85,13 @@ public class VersioningTest extends TestCase {
     assertEquals(C, version1_1.c);
   }
 
+  @Test
   public void testIgnoreLaterVersionClassSerialization() {
     Gson gson = builder.setVersion(1.0).create();
     assertEquals("null", gson.toJson(new Version1_2()));
   }
 
+  @Test
   public void testIgnoreLaterVersionClassDeserialization() {
     Gson gson = builder.setVersion(1.0).create();
     String json = "{\"a\":3,\"b\":4,\"c\":5,\"d\":6}";
@@ -94,12 +101,14 @@ public class VersioningTest extends TestCase {
     assertNull(version1_2);
   }
 
+  @Test
   public void testVersionedGsonWithUnversionedClassesSerialization() {
     Gson gson = builder.setVersion(1.0).create();
     BagOfPrimitives target = new BagOfPrimitives(10, 20, false, "stringValue");
     assertEquals(target.getExpectedJson(), gson.toJson(target));
   }
 
+  @Test
   public void testVersionedGsonWithUnversionedClassesDeserialization() {
     Gson gson = builder.setVersion(1.0).create();
     String json = "{\"longValue\":10,\"intValue\":20,\"booleanValue\":false}";
@@ -112,6 +121,7 @@ public class VersioningTest extends TestCase {
     assertEquals(expected, actual);
   }
 
+  @Test
   public void testVersionedGsonMixingSinceAndUntilSerialization() {
     Gson gson = builder.setVersion(1.0).create();
     SinceUntilMixing target = new SinceUntilMixing();
@@ -127,6 +137,7 @@ public class VersioningTest extends TestCase {
     assertFalse(json.contains("\"b\":" + B));
   }
 
+  @Test
   public void testVersionedGsonMixingSinceAndUntilDeserialization() {
     String json = "{\"a\":5,\"b\":6}";
     Gson gson = builder.setVersion(1.0).create();

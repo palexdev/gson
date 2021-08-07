@@ -17,17 +17,20 @@
 package com.google.gson.functional;
 
 import com.google.gson.JsonArray;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests for adding primitives to a JsonArray.
  *
  * @author Dillon Dixon
  */
-public class JsonArrayTest extends TestCase {
+public class JsonArrayTest {
 
+  @Test
   public void testStringPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -40,6 +43,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[\"Hello\",\"Goodbye\",\"Thank you\",null,\"Yes\"]", jsonArray.toString());
   }
 
+  @Test
   public void testIntegerPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -63,6 +67,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[1,2,-3,null,4,0]", jsonArray.toString());
   }
 
+  @Test
   public void testDoublePrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -85,6 +90,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[1.0,2.13232,0.121,null,-0.00234,null]", jsonArray.toString());
   }
 
+  @Test
   public void testBooleanPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -98,6 +104,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[true,true,false,false,null,true]", jsonArray.toString());
   }
 
+  @Test
   public void testCharPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -112,6 +119,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[\"a\",\"e\",\"i\",\"o\",null,\"u\",\"and sometimes Y\"]", jsonArray.toString());
   }
 
+  @Test
   public void testMixedPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -127,6 +135,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[\"a\",\"apple\",12121,\"o\",null,null,12.232,2323]", jsonArray.toString());
   }
 
+  @Test
   public void testNullPrimitiveAddition() {
     JsonArray jsonArray = new JsonArray();
 
@@ -143,6 +152,7 @@ public class JsonArrayTest extends TestCase {
     assertEquals("[null,null,null,null,null,null,null,null,null]", jsonArray.toString());
   }
 
+  @Test
   public void testSameAddition() {
     JsonArray jsonArray = new JsonArray();
 

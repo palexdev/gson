@@ -16,55 +16,52 @@
 
 package com.google.gson.functional;
 
+import com.google.gson.*;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.common.MoreAsserts;
+import com.google.gson.reflect.TypeToken;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.annotations.SerializedName;
-import com.google.gson.common.MoreAsserts;
-import com.google.gson.reflect.TypeToken;
+import static org.junit.jupiter.api.Assertions.*;
 
-import junit.framework.TestCase;
 /**
  * Functional tests for Java 5.0 enums.
  *
  * @author Inderjeet Singh
  * @author Joel Leitch
  */
-public class EnumTest extends TestCase {
+public class EnumTest {
 
   private Gson gson;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
-    super.setUp();
     gson = new Gson();
   }
 
-  public void testTopLevelEnumSerialization() throws Exception {
+  @Test
+  public void testTopLevelEnumSerialization() {
     String result = gson.toJson(MyEnum.VALUE1);
     assertEquals('"' + MyEnum.VALUE1.toString() + '"', result);
   }
 
-  public void testTopLevelEnumDeserialization() throws Exception {
+  @Test
+  public void testTopLevelEnumDeserialization() {
     MyEnum result = gson.fromJson('"' + MyEnum.VALUE1.toString() + '"', MyEnum.class);
     assertEquals(MyEnum.VALUE1, result);
   }
 
+  @Test
   public void testCollectionOfEnumsSerialization() {
     Type type = new TypeToken<Collection<MyEnum>>() {}.getType();
-    Collection<MyEnum> target = new ArrayList<MyEnum>();
+    Collection<MyEnum> target = new ArrayList<>();
     target.add(MyEnum.VALUE1);
     target.add(MyEnum.VALUE2);
     String expectedJson = "[\"VALUE1\",\"VALUE2\"]";
@@ -74,6 +71,7 @@ public class EnumTest extends TestCase {
     assertEquals(expectedJson, actualJson);
   }
 
+  @Test
   public void testCollectionOfEnumsDeserialization() {
     Type type = new TypeToken<Collection<MyEnum>>() {}.getType();
     String json = "[\"VALUE1\",\"VALUE2\"]";
@@ -82,19 +80,21 @@ public class EnumTest extends TestCase {
     MoreAsserts.assertContains(target, MyEnum.VALUE2);
   }
 
-  public void testClassWithEnumFieldSerialization() throws Exception {
+  @Test
+  public void testClassWithEnumFieldSerialization() {
     ClassWithEnumFields target = new ClassWithEnumFields();
     assertEquals(target.getExpectedJson(), gson.toJson(target));
   }
 
-  public void testClassWithEnumFieldDeserialization() throws Exception {
+  @Test
+  public void testClassWithEnumFieldDeserialization() {
     String json = "{value1:'VALUE1',value2:'VALUE2'}";
     ClassWithEnumFields target = gson.fromJson(json, ClassWithEnumFields.class);
     assertEquals(MyEnum.VALUE1,target.value1);
     assertEquals(MyEnum.VALUE2,target.value2);
   }
 
-  private static enum MyEnum {
+  private enum MyEnum {
     VALUE1, VALUE2
   }
 
@@ -109,8 +109,9 @@ public class EnumTest extends TestCase {
   /**
    * Test for issue 226.
    */
+  @Test
   public void testEnumSubclass() {
-    assertFalse(Roshambo.class == Roshambo.ROCK.getClass());
+    assertNotSame(Roshambo.class, Roshambo.ROCK.getClass());
     assertEquals("\"ROCK\"", gson.toJson(Roshambo.ROCK));
     assertEquals("[\"ROCK\",\"PAPER\",\"SCISSORS\"]", gson.toJson(EnumSet.allOf(Roshambo.class)));
     assertEquals(Roshambo.ROCK, gson.fromJson("\"ROCK\"", Roshambo.class));
@@ -118,11 +119,12 @@ public class EnumTest extends TestCase {
         gson.fromJson("[\"ROCK\",\"PAPER\",\"SCISSORS\"]", new TypeToken<Set<Roshambo>>() {}.getType()));
   }
 
+  @Test
   public void testEnumSubclassWithRegisteredTypeAdapter() {
     gson = new GsonBuilder()
         .registerTypeHierarchyAdapter(Roshambo.class, new MyEnumTypeAdapter())
         .create();
-    assertFalse(Roshambo.class == Roshambo.ROCK.getClass());
+    assertNotSame(Roshambo.class, Roshambo.ROCK.getClass());
     assertEquals("\"123ROCK\"", gson.toJson(Roshambo.ROCK));
     assertEquals("[\"123ROCK\",\"123PAPER\",\"123SCISSORS\"]", gson.toJson(EnumSet.allOf(Roshambo.class)));
     assertEquals(Roshambo.ROCK, gson.fromJson("\"123ROCK\"", Roshambo.class));
@@ -130,8 +132,9 @@ public class EnumTest extends TestCase {
         gson.fromJson("[\"123ROCK\",\"123PAPER\",\"123SCISSORS\"]", new TypeToken<Set<Roshambo>>() {}.getType()));
   }
 
+  @Test
   public void testEnumSubclassAsParameterizedType() {
-    Collection<Roshambo> list = new ArrayList<Roshambo>();
+    Collection<Roshambo> list = new ArrayList<>();
     list.add(Roshambo.ROCK);
     list.add(Roshambo.PAPER);
 
@@ -143,12 +146,14 @@ public class EnumTest extends TestCase {
     MoreAsserts.assertContains(actualJsonList, Roshambo.ROCK);
     MoreAsserts.assertContains(actualJsonList, Roshambo.PAPER);
   }
+  @Test
 
   public void testEnumCaseMapping() {
     assertEquals(Gender.MALE, gson.fromJson("\"boy\"", Gender.class));
     assertEquals("\"boy\"", gson.toJson(Gender.MALE, Gender.class));
   }
 
+  @Test
   public void testEnumSet() {
     EnumSet<Roshambo> foo = EnumSet.of(Roshambo.ROCK, Roshambo.PAPER);
     String json = gson.toJson(foo);
@@ -199,6 +204,7 @@ public class EnumTest extends TestCase {
     FEMALE
   }
 
+  @Test
   public void testEnumClassWithFields() {
 	  assertEquals("\"RED\"", gson.toJson(Color.RED));
 	  assertEquals("red", gson.fromJson("RED", Color.class).value);
@@ -208,7 +214,7 @@ public class EnumTest extends TestCase {
 	  RED("red", 1), BLUE("blue", 2), GREEN("green", 3);
 	  String value;
 	  int index;
-	  private Color(String value, int index) {
+	  Color(String value, int index) {
 		  this.value = value;
 		  this.index = index;
 	  }
